@@ -8,8 +8,8 @@ export class Member {
     @Column({ length: 255 })
     fullName: string;
 
-    @Column({ length: 15 })
-    phoneNumber: string;
+    @Column({ length: 15, nullable: true })
+    phoneNumber: string | null;
 
     @Column({
         type: 'enum',
