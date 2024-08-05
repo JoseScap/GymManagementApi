@@ -13,8 +13,9 @@ export class MembersService {
     private memberRepository: Repository<Member>
   ) { }
 
-  create(createMemberDto: CreateMemberRequest) {
-    return 'This action adds a new member';
+  async create(createMemberDto: CreateMemberRequest): Promise<void> {
+    const newMember = this.memberRepository.create(createMemberDto);
+    await this.memberRepository.save(newMember);
   }
 
   async findPaginated(page: number): Promise<PaginatedApiResponse<Member>> {
