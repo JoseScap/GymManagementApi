@@ -17,7 +17,7 @@ export class MembersService {
     return 'This action adds a new member';
   }
 
-  async findAll(page: number): Promise<PaginatedApiResponse<Member>> {
+  async findPaginated(page: number): Promise<PaginatedApiResponse<Member>> {
     if (page < 1) page = 1
 
     // Contamos cuantos miembros hay
@@ -51,8 +51,8 @@ export class MembersService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} member`;
+  findOne(id: string): Promise<Member> {
+    return this.memberRepository.findOneBy({ id });
   }
 
   update(id: number, updateMemberDto: UpdateMemberDto) {

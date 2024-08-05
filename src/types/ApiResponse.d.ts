@@ -7,3 +7,7 @@ export type PaginatedApiResponse<T> = {
   items: number,
   data: T[]
 }
+
+export type SingleApiResponse<T> = {
+  data: T
+}

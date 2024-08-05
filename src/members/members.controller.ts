@@ -2,7 +2,9 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
-import { FindMembersResponse } from './dto/response/find-members.response';
+import { FindPaginatedResponse } from './dto/response/find-paginated.response';
+import { SingleApiResponse } from 'src/types/ApiResponse';
+import { FindOneResponse } from './dto/response/find-one.response';
 
 @Controller('members')
 export class MembersController {
@@ -14,16 +16,17 @@ export class MembersController {
   }
 
   @Get()
-  findAll(@Query('page') page: string): Promise<FindMembersResponse> {
+  findPaginated(@Query('page') page: string): Promise<FindPaginatedResponse> {
     const parsedPage = Number(page)
     const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
 
-    return this.membersService.findAll(sanitizedPage);
+    return this.membersService.findPaginated(sanitizedPage);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.membersService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<FindOneResponse> {
+    const data = await this.membersService.findOne(id);
+    return { data }
   }
 
   @Patch(':id')
