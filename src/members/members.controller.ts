@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { MembersService } from './members.service';
 import { CreateMemberDto } from './dto/create-member.dto';
 import { UpdateMemberDto } from './dto/update-member.dto';
+import { FindMembersResponse } from './dto/response/find-members.response';
 
 @Controller('members')
 export class MembersController {
@@ -13,7 +14,7 @@ export class MembersController {
   }
 
   @Get()
-  findAll(@Query('page') page: string) {
+  findAll(@Query('page') page: string): Promise<FindMembersResponse> {
     const parsedPage = Number(page)
     const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
 
