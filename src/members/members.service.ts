@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMemberDto } from './dto/create-member.dto';
-import { UpdateMemberDto } from './dto/update-member.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Member } from './entities/member.entity';
 import { Repository } from 'typeorm';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
+import { CreateMemberRequest } from './dto/request/create-member.request';
+import { UpdateMemberRequest } from './dto/request/update-member.request';
 
 @Injectable()
 export class MembersService {
@@ -13,7 +13,7 @@ export class MembersService {
     private memberRepository: Repository<Member>
   ) { }
 
-  create(createMemberDto: CreateMemberDto) {
+  create(createMemberDto: CreateMemberRequest) {
     return 'This action adds a new member';
   }
 
@@ -55,7 +55,7 @@ export class MembersService {
     return this.memberRepository.findOneBy({ id });
   }
 
-  update(id: number, updateMemberDto: UpdateMemberDto) {
+  update(id: number, updateMemberDto: UpdateMemberRequest) {
     return `This action updates a #${id} member`;
   }
 

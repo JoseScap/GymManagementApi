@@ -1,17 +1,17 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { MembersService } from './members.service';
-import { CreateMemberDto } from './dto/create-member.dto';
-import { UpdateMemberDto } from './dto/update-member.dto';
 import { FindPaginatedResponse } from './dto/response/find-paginated.response';
 import { SingleApiResponse } from 'src/types/ApiResponse';
 import { FindOneResponse } from './dto/response/find-one.response';
+import { CreateMemberRequest } from './dto/request/create-member.request';
+import { UpdateMemberRequest } from './dto/request/update-member.request';
 
 @Controller('members')
 export class MembersController {
   constructor(private readonly membersService: MembersService) {}
 
   @Post()
-  create(@Body() createMemberDto: CreateMemberDto) {
+  create(@Body() createMemberDto: CreateMemberRequest) {
     return this.membersService.create(createMemberDto);
   }
 
@@ -30,7 +30,7 @@ export class MembersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMemberDto: UpdateMemberDto) {
+  update(@Param('id') id: string, @Body() updateMemberDto: UpdateMemberRequest) {
     return this.membersService.update(+id, updateMemberDto);
   }
 
