@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { MemberStatus } from "../enums/member.enum";
 
 @Entity('members')
 export class Member {
@@ -13,8 +14,8 @@ export class Member {
 
     @Column({
         type: 'enum',
-        enum: ['Inactivo', 'Día', 'Semana', 'Mes'],
-        default: 'Inactivo'
+        enum: MemberStatus,
+        default: MemberStatus.Inactivo
     })
     currentStatus: MemberStatus;
 
@@ -25,4 +26,3 @@ export class Member {
     isActive: boolean;
 }
 
-export type MemberStatus = 'Inactivo' | 'Día' | 'Semana' | 'Mes';

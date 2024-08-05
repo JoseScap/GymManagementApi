@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateMemberDto } from './dto/create-member.dto';
-import { UpdateMemberDto } from './dto/update-member.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Member } from './entities/member.entity';
 import { Repository } from 'typeorm';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
+import { CreateMemberRequest } from './dto/request/create-member.request';
+import { UpdateMemberRequest } from './dto/request/update-member.request';
 
 @Injectable()
 export class MembersService {
@@ -13,11 +13,12 @@ export class MembersService {
     private memberRepository: Repository<Member>
   ) { }
 
-  create(createMemberDto: CreateMemberDto) {
-    return 'This action adds a new member';
+  async create(createMemberDto: CreateMemberRequest): Promise<void> {
+    const newMember = this.memberRepository.create(createMemberDto);
+    await this.memberRepository.save(newMember);
   }
 
-  async findAll(page: number): Promise<PaginatedApiResponse<Member>> {
+  async findPaginated(page: number): Promise<PaginatedApiResponse<Member>> {
     if (page < 1) page = 1
 
     // Contamos cuantos miembros hay
@@ -51,11 +52,11 @@ export class MembersService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} member`;
+  findOne(id: string): Promise<Member> {
+    return this.memberRepository.findOneBy({ id });
   }
 
-  update(id: number, updateMemberDto: UpdateMemberDto) {
+  update(id: number, updateMemberDto: UpdateMemberRequest) {
     return `This action updates a #${id} member`;
   }
 
