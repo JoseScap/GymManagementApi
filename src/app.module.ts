@@ -1,12 +1,9 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TestsModule } from './tests/tests.module';
 import { Test } from './tests/entities/test.entity';
-import { MembersModule } from './members/members.module';
 import { Member } from './members/entities/member.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CommunicationsModule } from './communications/communications.module';
 
 @Module({
   imports: [
@@ -27,10 +24,9 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
       inject: [ConfigService]
     }),
-    TestsModule,
-    MembersModule
+    CommunicationsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
