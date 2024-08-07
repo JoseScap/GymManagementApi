@@ -1,5 +1,6 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne } from "typeorm";
 import { MemberStatus } from "../enums/member.enum";
+import { Fingerprint } from "src/fingerprints/entities/fingerprint.entity";
 
 @Entity('members')
 export class Member {
@@ -24,5 +25,8 @@ export class Member {
 
     @Column({ default: true })
     isActive: boolean;
+
+    @OneToOne(() => Fingerprint, fingerprint => fingerprint.member)
+    fingerprint: Fingerprint;
 }
 
