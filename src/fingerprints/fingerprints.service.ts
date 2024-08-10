@@ -1,11 +1,20 @@
 import { Injectable } from '@nestjs/common';
-import { CreateFingerprintDto } from './dto/request/create-fingerprint.dto';
+import { CreateOneRequest } from './dto/request/create-one.request';
 import { UpdateFingerprintDto } from './dto/request/update-fingerprint.dto';
+import { Fingerprint } from './entities/fingerprint.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class FingerprintsService {
-  create(createFingerprintDto: CreateFingerprintDto) {
-    return 'This action adds a new fingerprint';
+  constructor(
+    @InjectRepository(Fingerprint)
+    private fingerprintRepository: Repository<Fingerprint>
+  ) { }
+
+  async create(createOneRequest: CreateOneRequest): Promise<void> {
+    const newFingerTemplate = this.fingerprintRepository.create(createOneRequest)
+    await this.fingerprintRepository.save(newFingerTemplate)
   }
 
   findAll() {

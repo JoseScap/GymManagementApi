@@ -1,15 +1,17 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { FingerprintsService } from './fingerprints.service';
-import { CreateFingerprintDto } from './dto/request/create-fingerprint.dto';
+import { CreateOneRequest } from './dto/request/create-one.request';
 import { UpdateFingerprintDto } from './dto/request/update-fingerprint.dto';
+import { CreateOneFingerprintResponse } from './dto/response/create-one.response';
 
 @Controller('fingerprints')
 export class FingerprintsController {
   constructor(private readonly fingerprintsService: FingerprintsService) {}
 
   @Post()
-  create(@Body() createFingerprintDto: CreateFingerprintDto) {
-    return this.fingerprintsService.create(createFingerprintDto);
+  async create(@Body() createFingerprintDto: CreateOneRequest): Promise<CreateOneFingerprintResponse> {
+    await this.fingerprintsService.create(createFingerprintDto);
+    return { data: null }
   }
 
   @Get()
