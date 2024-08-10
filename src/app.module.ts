@@ -7,6 +7,7 @@ import { Test } from './tests/entities/test.entity';
 import { MembersModule } from './members/members.module';
 import { Member } from './members/entities/member.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -28,7 +29,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       inject: [ConfigService]
     }),
     TestsModule,
-    MembersModule
+    MembersModule,
+    SubscriptionsModule
   ],
   controllers: [AppController],
   providers: [AppService],
