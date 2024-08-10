@@ -26,6 +26,7 @@ export class _005Fingerprint1723327064075 implements MigrationInterface {
         }), true);
 
         await queryRunner.createForeignKey('fingerprints', new TableForeignKey({
+            name: "FK_Fingerprints_MemberId",
             columnNames: ['memberId'],
             referencedColumnNames: ['id'],
             referencedTableName: 'members',
@@ -35,7 +36,9 @@ export class _005Fingerprint1723327064075 implements MigrationInterface {
 
     public async down(queryRunner: QueryRunner): Promise<void> {
         const table = await queryRunner.getTable('fingerprints');
-        const foreignKey = table.foreignKeys.find(fk => fk.columnNames.indexOf('memberId') !== -1);
+        const foreignKey = table.foreignKeys.find(
+            index => index.columnNames.includes('memberId')
+        );
         await queryRunner.dropForeignKey('fingerprints', foreignKey);
         await queryRunner.dropTable('fingerprints');
     }
