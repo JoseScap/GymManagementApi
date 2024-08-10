@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { MemberStatus } from "../enums/member.enum";
 
 @Entity('members')
@@ -24,5 +24,11 @@ export class Member {
 
     @Column({ default: true })
     isActive: boolean;
+
+    @CreateDateColumn({ type: 'timestamp' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    updatedAt: Date;
 }
 
