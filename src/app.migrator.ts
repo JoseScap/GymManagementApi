@@ -10,6 +10,6 @@ export const MigrationDataSource = new DataSource({
   username: process.env.GM_DATABASE_USERNAME,
   password: process.env.GM_DATABASE_PASSWORD,
   entities: [],
-  migrations: ['./src/migrations/*.ts'],
+  migrations: ['./src/migrations/*.ts', './src/seeds/*.ts'],
   synchronize: false
 })
