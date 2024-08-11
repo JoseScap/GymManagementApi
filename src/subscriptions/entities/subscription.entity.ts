@@ -26,6 +26,9 @@ export class Subscription {
     })
     paymentMethod: PaymentMethod;
 
+    @Column({ default: false })
+    status: boolean;
+
     @Column({ length : 36 })
     memberId: string;
 
