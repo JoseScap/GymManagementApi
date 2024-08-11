@@ -15,8 +15,20 @@ export class CommunicationsGateway implements OnGatewayConnection, OnGatewayDisc
     console.log('Client disconnected', client.id)
   }
 
+  @SubscribeMessage('App:Ping')
+  AppPing() {
+    console.log("App:Ping emit Bio:Ping")
+    this.server.emit('Bio:Ping', { data: true })
+  }
+
+  @SubscribeMessage('Bio:Pong')
+  BioPong(@MessageBody() data) {
+    console.log("Bio:Pong emit App:Pong")
+    this.server.emit('App:Pong', data)
+  }
+
   @SubscribeMessage('App:RegisterFingerprint')
   registerFingerprint(@MessageBody() data: AppRegisterFingerprint) {
-    if (typeof data.status === 'boolean') this.server.emit('Bio:RegisterFingerprint', data)
+    if (typeof data.value === 'boolean') this.server.emit('Bio:RegisterFingerprint', data)
   }
 }
