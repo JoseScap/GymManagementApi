@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { FingerprintsService } from './fingerprints.service';
 import { CreateOneRequest } from './dto/request/create-one.request';
 import { UpdateFingerprintDto } from './dto/request/update-fingerprint.dto';
 import { CreateOneFingerprintResponse } from './dto/response/create-one.response';
+import { FindPaginatedFingerprintResponse } from './dto/response/find-paginated.response';
 
 @Controller('fingerprints')
 export class FingerprintsController {
@@ -15,8 +16,11 @@ export class FingerprintsController {
   }
 
   @Get()
-  findAll() {
-    return this.fingerprintsService.findAll();
+  findPaginated(@Query('page') page: string): Promise<FindPaginatedFingerprintResponse> {
+    const parsedPage = Number(page)
+    const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
+    
+    return this.fingerprintsService.findPaginated(sanitizedPage);
   }
 
   @Get(':id')
