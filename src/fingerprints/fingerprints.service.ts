@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateOneRequest } from './dto/request/create-one.request';
-import { UpdateFingerprintDto } from './dto/request/update-fingerprint.dto';
+import { CreateOneFingerprintRequest } from './dto/request/create-one.request';
+import { UpdateOneFingerprintRequest } from './dto/request/update-one.request';
 import { Fingerprint } from './entities/fingerprint.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -13,7 +13,7 @@ export class FingerprintsService {
     private fingerprintRepository: Repository<Fingerprint>
   ) { }
 
-  async create(createOneRequest: CreateOneRequest): Promise<void> {
+  async create(createOneRequest: CreateOneFingerprintRequest): Promise<void> {
     const newFingerTemplate = this.fingerprintRepository.create(createOneRequest)
     await this.fingerprintRepository.save(newFingerTemplate)
   }
@@ -61,7 +61,7 @@ export class FingerprintsService {
     return fingerprint;
   }
 
-  update(id: number, updateFingerprintDto: UpdateFingerprintDto) {
+  update(id: number, updateFingerprintDto: UpdateOneFingerprintRequest) {
     return `This action updates a #${id} fingerprint`;
   }
 

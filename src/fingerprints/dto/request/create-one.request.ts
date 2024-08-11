@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString, IsUUID, Length } from "class-validator";
 
-export class CreateOneRequest {
+export class CreateOneFingerprintRequest {
     @IsString({ message: 'La plantilla dactilar debe ser un blob convertida a base64' })
     @IsNotEmpty({ message: 'La plantilla dactilar es obligatoria' })
     fingerTemplate: string;

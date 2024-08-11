@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { FingerprintsService } from './fingerprints.service';
-import { CreateOneRequest } from './dto/request/create-one.request';
-import { UpdateFingerprintDto } from './dto/request/update-fingerprint.dto';
+import { CreateOneFingerprintRequest } from './dto/request/create-one.request';
+import { UpdateOneFingerprintRequest } from './dto/request/update-one.request';
 import { CreateOneFingerprintResponse } from './dto/response/create-one.response';
 import { FindPaginatedFingerprintResponse } from './dto/response/find-paginated.response';
 import { FindOneFingerprintResponse } from './dto/response/find-one.response';
@@ -12,7 +12,7 @@ export class FingerprintsController {
   constructor(private readonly fingerprintsService: FingerprintsService) {}
 
   @Post()
-  async create(@Body() createFingerprintDto: CreateOneRequest): Promise<CreateOneFingerprintResponse> {
+  async create(@Body() createFingerprintDto: CreateOneFingerprintRequest): Promise<CreateOneFingerprintResponse> {
     await this.fingerprintsService.create(createFingerprintDto);
     return { data: null }
   }
@@ -32,7 +32,7 @@ export class FingerprintsController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFingerprintDto: UpdateFingerprintDto) {
+  update(@Param('id') id: string, @Body() updateFingerprintDto: UpdateOneFingerprintRequest) {
     return this.fingerprintsService.update(+id, updateFingerprintDto);
   }
 
