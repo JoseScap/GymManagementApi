@@ -1,4 +1,3 @@
-import { query } from "express";
 import { MigrationInterface, QueryRunner, TableColumn } from "typeorm";
 
 export class _006SubscriptionStatus1723340742963 implements MigrationInterface {
