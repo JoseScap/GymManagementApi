@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOneRequest } from './dto/request/create-one.request';
 import { UpdateFingerprintDto } from './dto/request/update-fingerprint.dto';
 import { Fingerprint } from './entities/fingerprint.entity';
@@ -55,6 +55,9 @@ export class FingerprintsService {
 
   async findOne(id: number): Promise<Fingerprint> {
     const fingerprint = await this.fingerprintRepository.findOneBy({ id })
+    if (!fingerprint) {
+      throw new NotFoundException(`Fingerprint with ID ${id} not found`);
+    }
     return fingerprint;
   }
 
