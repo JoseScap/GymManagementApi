@@ -8,6 +8,9 @@ import { MembersModule } from './members/members.module';
 import { Member } from './members/entities/member.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { FingerprintsModule } from './fingerprints/fingerprints.module';
+import { Subscription } from './subscriptions/entities/subscription.entity';
+import { Fingerprint } from './fingerprints/entities/fingerprint.entity';
 
 @Module({
   imports: [
@@ -21,7 +24,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
         database: configService.get<string>('DATABASE_NAME'),
         username: configService.get<string>('GU_DATABASE_USERNAME'),
         password: configService.get<string>('GU_DATABASE_PASSWORD'),
-        entities: [Test, Member],
+        entities: [Test, Member, Subscription, Fingerprint],
         synchronize: false,
         logging: true,
         logger: 'simple-console'
@@ -30,7 +33,8 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     }),
     TestsModule,
     MembersModule,
-    SubscriptionsModule
+    SubscriptionsModule,
+    FingerprintsModule
   ],
   controllers: [AppController],
   providers: [AppService],

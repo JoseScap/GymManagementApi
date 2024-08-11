@@ -1,6 +1,8 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, ManyToOne, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
 import { MemberStatus } from "../enums/member.enum";
 import { Subscription } from "src/subscriptions/entities/subscription.entity";
+import { Fingerprint } from "src/fingerprints/entities/fingerprint.entity";
+
 @Entity('members')
 export class Member {
     @PrimaryGeneratedColumn('uuid')
@@ -25,6 +27,9 @@ export class Member {
     @Column({ default: true })
     isActive: boolean;
 
+    @OneToOne(() => Fingerprint, fingerprint => fingerprint.member)
+    fingerprint: Fingerprint;
+    
     @OneToMany(() => Subscription, subscription => subscription.member)
     subscriptions: Subscription[];
 
