@@ -4,3 +4,9 @@ export enum MemberStatus {
   Semana = 'Semana',
   Mes = 'Mes',
 }
+
+export enum ActiveMemberStatus {
+  Día = MemberStatus.Día,
+  Semana = MemberStatus.Semana,
+  Mes = MemberStatus.Mes,
+}

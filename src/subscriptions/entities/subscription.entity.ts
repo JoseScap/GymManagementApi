@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, JoinColumn, ManyToOne } from "typeorm";
 import { PaymentMethod } from "../enums/subscription.enum";
 import { Member } from "src/members/entities/member.entity";
+import { ActiveMemberStatus } from "src/members/enums/member.enum";
 
 @Entity('subscriptions')
 export class Subscription {
@@ -25,6 +26,13 @@ export class Subscription {
         default: PaymentMethod.Efectivo
     })
     paymentMethod: PaymentMethod;
+
+    @Column({
+        type: 'enum',
+        enum: ActiveMemberStatus,
+        nullable: false
+    })
+    status: ActiveMemberStatus;
 
     @Column({ length : 36 })
     memberId: string;
