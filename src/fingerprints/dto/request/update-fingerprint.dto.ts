@@ -1,4 +1,4 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateFingerprintDto } from './create-fingerprint.dto';
+import { CreateOneRequest } from './create-one.request';
 
-export class UpdateFingerprintDto extends PartialType(CreateFingerprintDto) {}
+export class UpdateFingerprintDto extends PartialType(CreateOneRequest) {}
