@@ -1,0 +1,46 @@
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { FingerprintsService } from './fingerprints.service';
+import { CreateOneFingerprintRequest } from './dto/request/create-one.request';
+import { UpdateOneFingerprintRequest } from './dto/request/update-one.request';
+import { CreateOneFingerprintResponse } from './dto/response/create-one.response';
+import { FindPaginatedFingerprintResponse } from './dto/response/find-paginated.response';
+import { FindOneFingerprintResponse } from './dto/response/find-one.response';
+import { RemoveOneFingerprintResponse } from './dto/response/remove-one.response';
+import { UpdateOneFingerprintResponse } from './dto/response/update-one.response';
+
+@Controller('fingerprints')
+export class FingerprintsController {
+  constructor(private readonly service: FingerprintsService) {}
+
+  @Post()
+  async createOne(@Body() createFingerprintDto: CreateOneFingerprintRequest): Promise<CreateOneFingerprintResponse> {
+    await this.service.create(createFingerprintDto);
+    return { data: null }
+  }
+
+  @Get()
+  findPaginated(@Query('page') page: string): Promise<FindPaginatedFingerprintResponse> {
+    const parsedPage = Number(page)
+    const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
+    
+    return this.service.findPaginated(sanitizedPage);
+  }
+
+  @Get(':id')
+  async findOne(@Param('id') id: string): Promise<FindOneFingerprintResponse> {
+    const fingerprint = await this.service.findOne(+id);
+    return { data: fingerprint }
+  }
+
+  @Patch(':id')
+  async updateOne(@Param('id') id: string, @Body() updateFingerprintDto: UpdateOneFingerprintRequest): Promise<UpdateOneFingerprintResponse> {
+    await this.service.update(+id, updateFingerprintDto);
+    return { data: null }
+  }
+
+  @Delete(':id')
+  async removeOne(@Param('id') id: string): Promise<RemoveOneFingerprintResponse> {
+    const deletedId = await this.service.remove(+id);
+    return { data: deletedId }
+  }
+}
