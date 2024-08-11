@@ -4,7 +4,7 @@ import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "ty
 @Entity('fingerprints')
 export class Fingerprint {
     @PrimaryGeneratedColumn('increment')
-    id: string;
+    id: number;
 
     @Column({ type: 'text' })
     fingerTemplate: string

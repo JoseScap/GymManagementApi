@@ -4,6 +4,7 @@ import { CreateOneRequest } from './dto/request/create-one.request';
 import { UpdateFingerprintDto } from './dto/request/update-fingerprint.dto';
 import { CreateOneFingerprintResponse } from './dto/response/create-one.response';
 import { FindPaginatedFingerprintResponse } from './dto/response/find-paginated.response';
+import { FindOneFingerprintResponse } from './dto/response/find-one.response';
 
 @Controller('fingerprints')
 export class FingerprintsController {
@@ -24,8 +25,9 @@ export class FingerprintsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.fingerprintsService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<FindOneFingerprintResponse> {
+    const fingerprint = await this.fingerprintsService.findOne(+id);
+    return { data: fingerprint }
   }
 
   @Patch(':id')

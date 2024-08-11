@@ -53,8 +53,9 @@ export class FingerprintsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} fingerprint`;
+  async findOne(id: number): Promise<Fingerprint> {
+    const fingerprint = await this.fingerprintRepository.findOneBy({ id })
+    return fingerprint;
   }
 
   update(id: number, updateFingerprintDto: UpdateFingerprintDto) {
