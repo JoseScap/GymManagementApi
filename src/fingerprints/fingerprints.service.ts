@@ -10,12 +10,12 @@ import { PaginatedApiResponse } from 'src/types/ApiResponse';
 export class FingerprintsService {
   constructor(
     @InjectRepository(Fingerprint)
-    private fingerprintRepository: Repository<Fingerprint>
+    private repository: Repository<Fingerprint>
   ) { }
 
   async create(createOneRequest: CreateOneFingerprintRequest): Promise<void> {
-    const newFingerTemplate = this.fingerprintRepository.create(createOneRequest)
-    await this.fingerprintRepository.save(newFingerTemplate)
+    const newFingerTemplate = this.repository.create(createOneRequest)
+    await this.repository.save(newFingerTemplate)
   }
 
   async findPaginated(page: number): Promise<PaginatedApiResponse<Fingerprint>> {
@@ -23,7 +23,7 @@ export class FingerprintsService {
     const perPage = 1500;
 
     // Contamos cuantos miembros hay
-    const items = await this.fingerprintRepository.count();
+    const items = await this.repository.count();
 
     // Calculamos la primer pagina y si existe anterior
     const first = items > 0 ? 1 : 0
@@ -37,7 +37,7 @@ export class FingerprintsService {
     const pages = last;
 
     // buscamos la data
-    const data = await this.fingerprintRepository.find({
+    const data = await this.repository.find({
       skip: (page - 1) * perPage,
       take: perPage
     });
@@ -54,23 +54,27 @@ export class FingerprintsService {
   }
 
   async findOne(id: number): Promise<Fingerprint> {
-    const fingerprint = await this.fingerprintRepository.findOneBy({ id })
+    const fingerprint = await this.repository.findOneBy({ id })
     if (!fingerprint) {
       throw new NotFoundException(`Fingerprint with ID ${id} not found`);
     }
     return fingerprint;
   }
 
-  update(id: number, updateFingerprintDto: UpdateOneFingerprintRequest) {
-    return `This action updates a #${id} fingerprint`;
-  }
-
-  async remove(id: number): Promise<number> {
-    const fingerprint = await this.fingerprintRepository.findOneBy({ id })
+  async update(id: number, updateFingerprintDto: UpdateOneFingerprintRequest): Promise<void> {
+    const fingerprint = await this.repository.findOneBy({ id });
     if (!fingerprint) {
       throw new NotFoundException(`Fingerprint with ID ${id} not found`);
     }
-    await this.fingerprintRepository.remove(fingerprint)
+    await this.repository.update({ id }, updateFingerprintDto);
+  }
+
+  async remove(id: number): Promise<number> {
+    const fingerprint = await this.repository.findOneBy({ id })
+    if (!fingerprint) {
+      throw new NotFoundException(`Fingerprint with ID ${id} not found`);
+    }
+    await this.repository.remove(fingerprint)
     return fingerprint.id 
   }
 }
