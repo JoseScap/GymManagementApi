@@ -67,6 +67,9 @@ export class FingerprintsService {
 
   async remove(id: number): Promise<number> {
     const fingerprint = await this.fingerprintRepository.findOneBy({ id })
+    if (!fingerprint) {
+      throw new NotFoundException(`Fingerprint with ID ${id} not found`);
+    }
     await this.fingerprintRepository.remove(fingerprint)
     return fingerprint.id 
   }
