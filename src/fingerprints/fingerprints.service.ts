@@ -62,7 +62,9 @@ export class FingerprintsService {
     return `This action updates a #${id} fingerprint`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} fingerprint`;
+  async remove(id: number): Promise<number> {
+    const fingerprint = await this.fingerprintRepository.findOneBy({ id })
+    await this.fingerprintRepository.remove(fingerprint)
+    return fingerprint.id 
   }
 }

@@ -5,6 +5,7 @@ import { UpdateFingerprintDto } from './dto/request/update-fingerprint.dto';
 import { CreateOneFingerprintResponse } from './dto/response/create-one.response';
 import { FindPaginatedFingerprintResponse } from './dto/response/find-paginated.response';
 import { FindOneFingerprintResponse } from './dto/response/find-one.response';
+import { RemoveFingerprintResponse } from './dto/response/remove-response';
 
 @Controller('fingerprints')
 export class FingerprintsController {
@@ -36,7 +37,8 @@ export class FingerprintsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.fingerprintsService.remove(+id);
+  async remove(@Param('id') id: string): Promise<RemoveFingerprintResponse> {
+    const deletedId = await this.fingerprintsService.remove(+id);
+    return { data: deletedId }
   }
 }
