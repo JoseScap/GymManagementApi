@@ -5,7 +5,6 @@ import { Repository } from 'typeorm';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
 import { CreateMemberRequest } from './dto/request/create-member.request';
 import { UpdateMemberRequest } from './dto/request/update-member.request';
-import { UpdateMemberResponse } from './dto/response/update-member.response';
 @Injectable()
 export class MembersService {
   constructor(
@@ -52,8 +51,20 @@ export class MembersService {
     }
   }
 
-  findOne(id: string): Promise<Member> {
-    return this.memberRepository.findOneBy({ id });
+  async findOne(id: string, embedSubscriptions: boolean): Promise<Member> {
+    const member = await this.memberRepository.findOneBy({ id });
+
+    if (!member) {
+      throw new NotFoundException(`Member with ID ${id} not found`);
+    }
+
+    if (!embedSubscriptions) return member
+
+    /* Necesito el servicio de subscriptions para poder hacer esto */ 
+    // const subscriptions = await this.subscriptionsService.findByMemberId(id);
+    // member.subscriptions = subscriptions;
+
+    return member
   }
 
   async update(id: string, updateMemberDto: UpdateMemberRequest): Promise<void> {
