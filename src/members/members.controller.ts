@@ -5,7 +5,6 @@ import { FindOneMemberResponse } from './dto/response/find-one.response';
 import { CreateMemberRequest } from './dto/request/create-member.request';
 import { UpdateMemberRequest } from './dto/request/update-member.request';
 import { CreateOneMemberResponse } from './dto/response/create-one.response';
-import { FindOneMemberQueryDto } from 'src/members/dto/request/find-one-member.request';
 
 @Controller('members')
 export class MembersController {
@@ -28,9 +27,8 @@ export class MembersController {
   @Get(':id')
   async findOne(
     @Param('id') id: string,
-    @Query('embedSubscriptions', ParseBoolPipe) query?: FindOneMemberQueryDto
+    @Query('embedSubscriptions', ParseBoolPipe) embedSubscriptions: boolean
   ): Promise<FindOneMemberResponse> {
-    const { embedSubscriptions } = query
     const data = await this.membersService.findOne(id, embedSubscriptions);
     return { data }
   }
@@ -40,8 +38,13 @@ export class MembersController {
     return this.membersService.update(id, updateMemberDto);
   }
 
-  @Patch('/status/:id')
+  @Delete('/:id')
   remove(@Param('id') id: string ) {
-    return this.membersService.remove(id);
+    return this.membersService.removeOrRestore({ id, changeTo: false});
+  }
+
+  @Post('/:id')
+  restore(@Param('id') id: string ) {
+    return this.membersService.removeOrRestore({ id, changeTo: true });
   }
 }

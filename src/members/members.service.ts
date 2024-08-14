@@ -52,17 +52,14 @@ export class MembersService {
   }
 
   async findOne(id: string, embedSubscriptions: boolean): Promise<Member> {
-    const member = await this.memberRepository.findOneBy({ id });
-
+    let member: Member;
+    
+    if (embedSubscriptions) member = await this.memberRepository.findOne({ where: { id }, relations: { subscriptions: true } })
+    else member = await this.memberRepository.findOneBy({ id })
+    
     if (!member) {
       throw new NotFoundException(`Member with ID ${id} not found`);
     }
-
-    if (!embedSubscriptions) return member
-
-    /* Necesito el servicio de subscriptions para poder hacer esto */ 
-    // const subscriptions = await this.subscriptionsService.findByMemberId(id);
-    // member.subscriptions = subscriptions;
 
     return member
   }
@@ -74,18 +71,16 @@ export class MembersService {
       throw new NotFoundException(`Member with ID ${id} not found`);
     }
 
-    await this.memberRepository.update(id,
-      updateMemberDto
-    );
+    await this.memberRepository.update(id, updateMemberDto);
   }
 
-  async remove(id: string): Promise<void> {
-    const member = await this.memberRepository.findOneBy({ id });
+  async removeOrRestore(options :{ id: string, changeTo: boolean }): Promise<void> {
+    const member = await this.memberRepository.findOneBy({ id: options.id });
 
     if (!member) {
-      throw new NotFoundException(`Member with ID ${id} not found`);
+      throw new NotFoundException(`Member with ID ${options.id} not found`);
     }
 
-    await this.memberRepository.update(id, { isActive: !member.isActive });
+    await this.memberRepository.update(options.id, { isActive: options.changeTo });
   }
 }
