@@ -33,7 +33,7 @@ export class MembersController {
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMemberDto: UpdateMemberRequest) {
-    return this.membersService.update(+id, updateMemberDto);
+    return this.membersService.update(id, updateMemberDto);
   }
 
   @Delete(':id')
