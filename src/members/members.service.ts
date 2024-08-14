@@ -1,11 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Member } from './entities/member.entity';
 import { Repository } from 'typeorm';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
 import { CreateMemberRequest } from './dto/request/create-member.request';
 import { UpdateMemberRequest } from './dto/request/update-member.request';
-
 @Injectable()
 export class MembersService {
   constructor(
@@ -52,15 +51,36 @@ export class MembersService {
     }
   }
 
-  findOne(id: string): Promise<Member> {
-    return this.memberRepository.findOneBy({ id });
+  async findOne(id: string, embedSubscriptions: boolean): Promise<Member> {
+    let member: Member;
+    
+    if (embedSubscriptions) member = await this.memberRepository.findOne({ where: { id }, relations: { subscriptions: true } })
+    else member = await this.memberRepository.findOneBy({ id })
+    
+    if (!member) {
+      throw new NotFoundException(`Member with ID ${id} not found`);
+    }
+
+    return member
   }
 
-  update(id: number, updateMemberDto: UpdateMemberRequest) {
-    return `This action updates a #${id} member`;
+  async update(id: string, updateMemberDto: UpdateMemberRequest): Promise<void> {
+    const member = await this.memberRepository.findOneBy({ id });
+
+    if (!member) {
+      throw new NotFoundException(`Member with ID ${id} not found`);
+    }
+
+    await this.memberRepository.update(id, updateMemberDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} member`;
+  async removeOrRestore(options :{ id: string, changeTo: boolean }): Promise<void> {
+    const member = await this.memberRepository.findOneBy({ id: options.id });
+
+    if (!member) {
+      throw new NotFoundException(`Member with ID ${options.id} not found`);
+    }
+
+    await this.memberRepository.update(options.id, { isActive: options.changeTo });
   }
 }

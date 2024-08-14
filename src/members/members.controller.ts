@@ -1,7 +1,6 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseBoolPipe } from '@nestjs/common';
 import { MembersService } from './members.service';
 import { FindPaginatedMemberResponse } from './dto/response/find-paginated.response';
-import { SingleApiResponse } from 'src/types/ApiResponse';
 import { FindOneMemberResponse } from './dto/response/find-one.response';
 import { CreateMemberRequest } from './dto/request/create-member.request';
 import { UpdateMemberRequest } from './dto/request/update-member.request';
@@ -26,18 +25,26 @@ export class MembersController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string): Promise<FindOneMemberResponse> {
-    const data = await this.membersService.findOne(id);
+  async findOne(
+    @Param('id') id: string,
+    @Query('embedSubscriptions', ParseBoolPipe) embedSubscriptions: boolean
+  ): Promise<FindOneMemberResponse> {
+    const data = await this.membersService.findOne(id, embedSubscriptions);
     return { data }
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateMemberDto: UpdateMemberRequest) {
-    return this.membersService.update(+id, updateMemberDto);
+    return this.membersService.update(id, updateMemberDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.membersService.remove(+id);
+  @Delete('/:id')
+  remove(@Param('id') id: string ) {
+    return this.membersService.removeOrRestore({ id, changeTo: false});
+  }
+
+  @Post('/:id')
+  restore(@Param('id') id: string ) {
+    return this.membersService.removeOrRestore({ id, changeTo: true });
   }
 }
