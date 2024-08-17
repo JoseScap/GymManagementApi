@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, ParseBoolPipe } from '@nestjs/common';
 import { CreateSubscriptionsDto } from './dto/request/create-subscriptions.request.dto';
 import { UpdateSubscriptionsDto } from './dto/request/update-subscriptions.request.dto';
 import { SubscriptionsService } from './subscriptions.service';
+import { FindOneSubscriptionResponse } from './dto/response/find-one.response';
 
 @Controller('subscriptions')
 export class SubscriptionsController {
@@ -18,8 +19,12 @@ export class SubscriptionsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.subscriptionsService.findOne(+id);
+  async findOne(
+    @Param('id') id: string,
+    @Query('embedMember', ParseBoolPipe) embedMember: boolean
+  ) {
+    const data = await this.subscriptionsService.findOne(id, embedMember);
+    return { data }
   }
 
   @Patch(':id')
