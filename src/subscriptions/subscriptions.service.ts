@@ -30,15 +30,28 @@ export class SubscriptionsService {
     if (!subscription) {
       throw new NotFoundException(`Subscription #${id} not found`);
     }
-    
+
     return subscription
   }
 
-  update(id: number, updateSubscriptionsDto: UpdateSubscriptionsDto) {
-    return `This action updates a #${id} subscriptions2`;
+  async update(id: string, updateSubscriptionsDto: UpdateSubscriptionsDto): Promise<void> {
+    const subscription = await this.subscriptionRepository.findOneBy({ id });
+
+    if (!subscription) {
+      throw new NotFoundException(`Subscription #${id} not found`);
+    }
+
+    await this.subscriptionRepository.update(subscription, updateSubscriptionsDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} subscriptions2`;
+  async remove(id: string) {
+    const subscription = await this.subscriptionRepository.findOneBy({ id });
+
+    if(!subscription) {
+      throw new NotFoundException(`Subscription #${id} not found`);
+    }
+
+    // Definir si esto será un removeOrRestore como en el de members
+    await this.subscriptionRepository.update(subscription, { isCanceled: true });
   }
 }
