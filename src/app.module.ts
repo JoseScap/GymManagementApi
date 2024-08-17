@@ -7,10 +7,10 @@ import { Test } from './tests/entities/test.entity';
 import { MembersModule } from './members/members.module';
 import { Member } from './members/entities/member.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { FingerprintsModule } from './fingerprints/fingerprints.module';
 import { Subscription } from './subscriptions/entities/subscription.entity';
 import { Fingerprint } from './fingerprints/entities/fingerprint.entity';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
@@ -34,7 +34,8 @@ import { Fingerprint } from './fingerprints/entities/fingerprint.entity';
     TestsModule,
     MembersModule,
     SubscriptionsModule,
-    FingerprintsModule
+    FingerprintsModule,
+    SubscriptionsModule
   ],
   controllers: [AppController],
   providers: [AppService],
