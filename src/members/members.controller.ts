@@ -14,8 +14,8 @@ export class MembersController {
   constructor(private readonly membersService: MembersService) {}
 
   @Post()
-  async createOne(@Body() createMemberDto: CreateMemberRequest): Promise<CreateOneMemberResponse> {
-    await this.membersService.create(createMemberDto);
+  async createOne(@Body() createMemberRequest: CreateMemberRequest): Promise<CreateOneMemberResponse> {
+    await this.membersService.create(createMemberRequest);
     return { data: null }
   }
 
@@ -42,13 +42,13 @@ export class MembersController {
     return { data: null }
   }
 
-  @Delete('/:id')
+  @Delete(':id')
   async remove(@Param('id') id: string ): Promise<RemoveMemberResponse> {
     await this.membersService.removeOrRestore({ id, changeTo: false});
     return { data: null }
   }
 
-  @Post('/:id')
+  @Post(':id')
   async restore(@Param('id') id: string ): Promise<RestoreMemberResponse> {
     await this.membersService.removeOrRestore({ id, changeTo: true });
     return { data: null }

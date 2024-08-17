@@ -3,8 +3,7 @@ import { Type } from "class-transformer";
 import { PaymentMethod } from "src/subscriptions/enums/subscription.enum";
 import { ActiveMemberStatus } from "src/members/enums/member.enum";
 
-export class CreateSubscriptionsDto {
-    // En el primer campo van validaciones tipo si es un float digamos, pero lo dejo en blanco por ahora.
+export class CreateSubscriptionsRequest {
     @IsNumber({}, { message: "El campo 'amount' debe ser un número" })
     @IsNotEmpty({ message: "El campo 'amount' no puede estar vacío" })
     amount: number;
