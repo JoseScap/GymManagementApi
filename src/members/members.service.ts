@@ -1,12 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Member } from './entities/member.entity';
-import { Repository } from 'typeorm';
+import { FindManyOptions, Repository } from 'typeorm';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
 import { CreateMemberRequest } from './dto/request/create-member.request';
 import { UpdateMemberRequest } from './dto/request/update-member.request';
 import { PER_PAGE } from 'src/common/constants';
 import { RemoveRestoreMemberOptions } from './dto/service/remove-restore.dto';
+import { MemberStatus } from './enums/member.enum';
+
 @Injectable()
 export class MembersService {
   constructor(
@@ -19,7 +21,7 @@ export class MembersService {
     await this.memberRepository.save(newMember);
   }
 
-  async findPaginated(page: number): Promise<PaginatedApiResponse<Member>> {
+  async findPaginated(page: number, embedSubscriptions: boolean, currentStatus?: MemberStatus): Promise<PaginatedApiResponse<Member>> {
     if (page < 1) page = 1
 
     // Contamos cuantos miembros hay
@@ -37,10 +39,14 @@ export class MembersService {
     const pages = last;
 
     // buscamos la data
-    const data = await this.memberRepository.find({
+    const findManyOptions: FindManyOptions<Member> = {
       skip: (page - 1) * PER_PAGE,
-      take: PER_PAGE
-    });
+      take: PER_PAGE,
+      relations: { subscriptions: embedSubscriptions },
+    }
+    if (!!currentStatus) findManyOptions.where = { currentStatus }
+
+    const data = await this.memberRepository.find(findManyOptions);
 
     return {
       first,
@@ -56,8 +62,7 @@ export class MembersService {
   async findOne(id: string, embedSubscriptions: boolean): Promise<Member> {
     let member: Member;
     
-    if (embedSubscriptions) member = await this.memberRepository.findOne({ where: { id }, relations: { subscriptions: true } })
-    else member = await this.memberRepository.findOneBy({ id })
+    member = await this.memberRepository.findOne({ where: { id }, relations: { subscriptions: embedSubscriptions } })
     
     if (!member) {
       throw new NotFoundException(`Member with ID ${id} not found`);

@@ -8,6 +8,7 @@ import { CreateOneMemberResponse } from './dto/response/create-one.response';
 import { UpdateMemberResponse } from './dto/response/update-member.response';
 import { RemoveMemberResponse } from './dto/response/remove-member.response';
 import { RestoreMemberResponse } from './dto/response/restore-member.response';
+import { FindPaginatedMemberQuery } from './dto/query/find-paginated.query';
 
 @Controller('members')
 export class MembersController {
@@ -20,11 +21,15 @@ export class MembersController {
   }
 
   @Get()
-  findPaginated(@Query('page') page: string): Promise<FindPaginatedMemberResponse> {
+  findPaginated(
+    @Query() query: FindPaginatedMemberQuery
+  ): Promise<FindPaginatedMemberResponse> {
+    const { page, embedSubscriptions, currentStatus } = query;
+
     const parsedPage = Number(page)
     const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
 
-    return this.membersService.findPaginated(sanitizedPage);
+    return this.membersService.findPaginated(sanitizedPage, embedSubscriptions === 'true', currentStatus);
   }
 
   @Get(':id')
