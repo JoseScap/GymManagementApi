@@ -20,7 +20,8 @@ export class SubscriptionsService {
     await this.subscriptionRepository.save(newSubscription);
   }
 
-  async findPaginated(page: number): Promise<PaginatedApiResponse<Subscription>> {
+  async findPaginated(page: number, embedMember: boolean): Promise<PaginatedApiResponse<Subscription>> {
+    let data: Subscription[]
     if (page < 1) page = 1
 
     // Contamos cuantos subscriptions hay
@@ -38,9 +39,10 @@ export class SubscriptionsService {
     const pages = last;
 
     // buscamos la data
-    const data = await this.subscriptionRepository.find({
+    data = await this.subscriptionRepository.find({
       skip: (page - 1) * PER_PAGE,
-      take: PER_PAGE
+      take: PER_PAGE,
+      relations: { member: embedMember }
     });
 
     return {
@@ -57,8 +59,7 @@ export class SubscriptionsService {
   async findOne(id: string, embedMember: boolean): Promise<Subscription> {
     let subscription: Subscription;
 
-    if (embedMember) subscription = await this.subscriptionRepository.findOne({ where: { id }, relations: { member: true } })
-    else subscription = await this.subscriptionRepository.findOneBy({ id })
+    subscription = await this.subscriptionRepository.findOne({ where: { id }, relations: { member: embedMember } })
 
     if (!subscription) {
       throw new NotFoundException(`Subscription #${id} not found`);
