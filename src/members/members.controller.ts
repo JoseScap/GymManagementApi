@@ -5,14 +5,17 @@ import { FindOneMemberResponse } from './dto/response/find-one.response';
 import { CreateMemberRequest } from './dto/request/create-member.request';
 import { UpdateMemberRequest } from './dto/request/update-member.request';
 import { CreateOneMemberResponse } from './dto/response/create-one.response';
+import { UpdateMemberResponse } from './dto/response/update-member.response';
+import { RemoveMemberResponse } from './dto/response/remove-member.response';
+import { RestoreMemberResponse } from './dto/response/restore-member.response';
 
 @Controller('members')
 export class MembersController {
   constructor(private readonly membersService: MembersService) {}
 
   @Post()
-  async createOne(@Body() createMemberDto: CreateMemberRequest): Promise<CreateOneMemberResponse> {
-    await this.membersService.create(createMemberDto);
+  async createOne(@Body() createMemberRequest: CreateMemberRequest): Promise<CreateOneMemberResponse> {
+    await this.membersService.create(createMemberRequest);
     return { data: null }
   }
 
@@ -34,17 +37,20 @@ export class MembersController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMemberDto: UpdateMemberRequest) {
-    return this.membersService.update(id, updateMemberDto);
+  async update(@Param('id') id: string, @Body() updateMemberDto: UpdateMemberRequest): Promise<UpdateMemberResponse> {
+    await this.membersService.update(id, updateMemberDto);
+    return { data: null }
   }
 
-  @Delete('/:id')
-  remove(@Param('id') id: string ) {
-    return this.membersService.removeOrRestore({ id, changeTo: false});
+  @Delete(':id')
+  async remove(@Param('id') id: string ): Promise<RemoveMemberResponse> {
+    await this.membersService.removeOrRestore({ id, changeTo: false});
+    return { data: null }
   }
 
-  @Post('/:id')
-  restore(@Param('id') id: string ) {
-    return this.membersService.removeOrRestore({ id, changeTo: true });
+  @Post(':id')
+  async restore(@Param('id') id: string ): Promise<RestoreMemberResponse> {
+    await this.membersService.removeOrRestore({ id, changeTo: true });
+    return { data: null }
   }
 }
