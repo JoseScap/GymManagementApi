@@ -1,1 +1,1 @@
-export const PER_PAGE = 500
+export const PER_PAGE = 200
