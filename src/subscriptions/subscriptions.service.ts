@@ -42,6 +42,9 @@ export class SubscriptionsService {
     data = await this.subscriptionRepository.find({
       skip: (page - 1) * PER_PAGE,
       take: PER_PAGE,
+      order: {
+        createdAt: 'DESC'
+      },
       relations: { member: embedMember }
     });
 
