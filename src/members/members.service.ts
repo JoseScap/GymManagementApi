@@ -124,7 +124,11 @@ export class MembersService {
   async findOne(id: string, embedSubscriptions: boolean): Promise<Member> {
     let member: Member;
     
-    member = await this.memberRepository.findOne({ where: { id }, relations: { subscriptions: embedSubscriptions } })
+    member = await this.memberRepository.findOne({
+      where: { id },
+      relations: { subscriptions: embedSubscriptions },
+      order: { subscriptions: { createdAt: 'DESC' } }
+    })
     
     if (!member) {
       throw new NotFoundException(`Member with ID ${id} not found`);
