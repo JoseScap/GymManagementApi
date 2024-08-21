@@ -3,24 +3,65 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSubscriptionsRequest } from './dto/request/create-subscriptions.request';
 import { UpdateSubscriptionsRequest } from './dto/request/update-subscriptions.request';
 import { Subscription } from './entities/subscription.entity';
-import { Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { PER_PAGE } from 'src/common/constants';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
 import { RemoveRestoreSubscriptionsOptions } from './dto/service/remove-restore.dto';
+import { Member } from 'src/members/entities/member.entity';
+import { ActiveMemberStatus, MemberStatus } from 'src/members/enums/member.enum';
 @Injectable()
 export class SubscriptionsService {
 
   constructor(
+    @InjectRepository(Member)
+    private memberRepository: Repository<Member>,
     @InjectRepository(Subscription)
-    private subscriptionRepository: Repository<Subscription>
+    private subscriptionRepository: Repository<Subscription>,
+    private dataSource: DataSource
   ) { }
 
-  async create(createSubscriptionsDto: CreateSubscriptionsRequest) {
-    const newSubscription = this.subscriptionRepository.create(createSubscriptionsDto);
-    await this.subscriptionRepository.save(newSubscription);
+  async create(request: CreateSubscriptionsRequest) {
+    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+    let result: string = null;
+
+    // Iniciar la transacción
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      const member = await this.memberRepository.findOne({ where: { id: request.memberId } })
+    
+      if (!member) {
+        throw new NotFoundException(`Member with ID ${request.memberId} not found`);
+      }
+
+      const subscription = this.subscriptionRepository.create(request);
+      await queryRunner.manager.save(subscription)
+
+      member.currentStatus = request.status === ActiveMemberStatus.Día
+        ? MemberStatus.Día
+        : request.status === ActiveMemberStatus.Semana
+        ? MemberStatus.Semana
+        : MemberStatus.Mes
+
+      await queryRunner.manager.save(member)
+      // Confirmar la transacción
+      await queryRunner.commitTransaction();
+      result = subscription.id
+    } catch (error) {
+      // Si ocurre un error, revertir la transacción
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      // Liberar el queryRunner
+      await queryRunner.release();
+    }
+
+    return result
   }
 
-  async findPaginated(page: number): Promise<PaginatedApiResponse<Subscription>> {
+  async findPaginated(page: number, embedMember: boolean): Promise<PaginatedApiResponse<Subscription>> {
+    let data: Subscription[]
     if (page < 1) page = 1
 
     // Contamos cuantos subscriptions hay
@@ -38,9 +79,13 @@ export class SubscriptionsService {
     const pages = last;
 
     // buscamos la data
-    const data = await this.subscriptionRepository.find({
+    data = await this.subscriptionRepository.find({
       skip: (page - 1) * PER_PAGE,
-      take: PER_PAGE
+      take: PER_PAGE,
+      order: {
+        createdAt: 'DESC'
+      },
+      relations: { member: embedMember }
     });
 
     return {
@@ -57,8 +102,7 @@ export class SubscriptionsService {
   async findOne(id: string, embedMember: boolean): Promise<Subscription> {
     let subscription: Subscription;
 
-    if (embedMember) subscription = await this.subscriptionRepository.findOne({ where: { id }, relations: { member: true } })
-    else subscription = await this.subscriptionRepository.findOneBy({ id })
+    subscription = await this.subscriptionRepository.findOne({ where: { id }, relations: { member: embedMember } })
 
     if (!subscription) {
       throw new NotFoundException(`Subscription #${id} not found`);

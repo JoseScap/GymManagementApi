@@ -1,4 +1,4 @@
-import { IsBoolean, IsByteLength, IsDate, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsByteLength, IsDate, IsEnum, IsNotEmpty, IsNumber, IsString } from "class-validator";
 import { Type } from "class-transformer";
 import { PaymentMethod } from "src/subscriptions/enums/subscription.enum";
 import { ActiveMemberStatus } from "src/members/enums/member.enum";
@@ -17,10 +17,6 @@ export class CreateSubscriptionsRequest {
     @IsNotEmpty({ message: "El campo 'dateTo' no puede estar vacío" })
     @Type(() => Date)
     dateTo: Date;
-
-    @IsBoolean({ message: "El campo 'isCanceled' debe ser un valor booleano" })
-    @IsNotEmpty({ message: "El campo 'isCanceled' no puede estar vacío" })
-    isCanceled: boolean;
 
     @IsEnum(PaymentMethod, { message: "El campo 'paymentMethod' debe ser un valor válido de PaymentMethod" })
     @IsNotEmpty({ message: "El campo 'paymentMethod' no puede estar vacío" })

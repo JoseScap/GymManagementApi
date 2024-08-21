@@ -8,26 +8,30 @@ import { RestoreSubscriptionResponse } from './dto/response/restore-subscription
 import { RemoveSubscriptionResponse } from './dto/response/remove-subscription.response';
 import { UpdateSubscriptionsResponse } from './dto/response/update-subscription.response';
 import { FindPaginatedSubscriptionsResponse } from './dto/response/find-paginated.response';
+import { MemberStatus } from 'src/members/enums/member.enum';
 
 @Controller('subscriptions')
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
 
-  @Post()
+  @Post('create-one')
   async createOne(@Body() createSubscriptionRequest: CreateSubscriptionsRequest): Promise<CreateOneSubscriptionResponse> {
     await this.subscriptionsService.create(createSubscriptionRequest);
     return { data: null }
   }
 
-  @Get()
-  async findPaginated(@Query('page') page: string): Promise<FindPaginatedSubscriptionsResponse> {
+  @Get('find-paginated')
+  async findPaginated(
+    @Query('page') page: string,
+    @Query('embedMember', ParseBoolPipe) embedMember: boolean
+  ): Promise<FindPaginatedSubscriptionsResponse> {
     const parsedPage = Number(page);
     const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
 
-    return this.subscriptionsService.findPaginated(sanitizedPage)
+    return this.subscriptionsService.findPaginated(sanitizedPage, embedMember)
   }
 
-  @Get(':id')
+  @Get('fina-one/:id')
   async findOne(
     @Param('id') id: string,
     @Query('embedMember', ParseBoolPipe) embedMember: boolean
@@ -36,19 +40,19 @@ export class SubscriptionsController {
     return { data }
   }
 
-  @Patch(':id')
+  @Patch('update/:id')
   async update(@Param('id') id: string, @Body() updateSubscriptionsRequest: UpdateSubscriptionsRequest): Promise<UpdateSubscriptionsResponse> {
     await this.subscriptionsService.update(id, updateSubscriptionsRequest);
     return { data: null }
   }
 
-  @Delete(':id')
+  @Delete('remove/:id')
   async remove(@Param('id') id: string): Promise<RemoveSubscriptionResponse> {
     await this.subscriptionsService.removeOrRestore({ id, changeTo: true });
     return { data: null }
   }
 
-  @Delete(':id')
+  @Delete('restore/:id')
   async restore(@Param('id') id: string): Promise<RestoreSubscriptionResponse> {
     await this.subscriptionsService.removeOrRestore({ id, changeTo: false });
     return { data: null }
