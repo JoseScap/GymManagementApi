@@ -29,9 +29,9 @@ export class MembersService {
     await this.memberRepository.save(newMember);
   }
 
-  async createOneWithSub(request: CreateSubscriptedMemberRequest): Promise<string> {
+  async createOneWithSub(request: CreateSubscriptedMemberRequest): Promise<Fingerprint> {
     const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
-    let result: string = null;
+    let result: Fingerprint;
 
     // Iniciar la transacción
     await queryRunner.connect();
@@ -77,7 +77,7 @@ export class MembersService {
 
       // Confirmar la transacción
       await queryRunner.commitTransaction();
-      result = subscription.id
+      result = fingerprint
     } catch (error) {
       // Si ocurre un error, revertir la transacción
       await queryRunner.rollbackTransaction();
@@ -144,6 +144,17 @@ export class MembersService {
       throw new NotFoundException(`Member with ID ${id} not found`);
     }
 
+    return member
+  }
+
+  async findOneByFingerprintId(id: number): Promise<Member> {
+    let member: Member;
+    
+    member = await this.memberRepository.findOne({
+      where: { fingerprint: { id } },
+      relations: { fingerprint: true }
+    })
+  
     return member
   }
 

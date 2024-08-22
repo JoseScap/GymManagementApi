@@ -14,5 +14,6 @@ import { Fingerprint } from 'src/fingerprints/entities/fingerprint.entity';
   ],
   controllers: [MembersController],
   providers: [MembersService],
+  exports: [MembersService]
 })
 export class MembersModule {}

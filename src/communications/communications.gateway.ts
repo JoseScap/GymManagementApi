@@ -1,11 +1,13 @@
 import { MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { ChangeStatusMessage } from './dto/input/change-status-message';
+import { MembersService } from 'src/members/members.service';
 
 @WebSocketGateway()
 export class CommunicationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server
+
+  constructor(private readonly membersService: MembersService) {}
 
   handleConnection(client: Socket) {
     console.log('Client connected', client.id)
@@ -50,14 +52,21 @@ export class CommunicationsGateway implements OnGatewayConnection, OnGatewayDisc
   }
 
   @SubscribeMessage('Bio:Identify')
-  BioIdentify(@MessageBody() message) {
-    console.log("Bio:Identify -> Emit -> App:Identify -> with data:", message)
-    this.server.emit('App:Identify', message)
+  async BioIdentify(@MessageBody() message) {
+    let member = await this.membersService.findOneByFingerprintId(message.Id)
+    console.log("Bio:Identify -> Emit -> App:Identify -> with ", message, "-> Result ->", member)
+    this.server.emit('App:Identify', member)
   }
 
   @SubscribeMessage('App:ChangeAction')
-  registerFingerprint(@MessageBody() data) {
-    console.log("App:ChangeAction -> Emit -> Bio:ChangeAction -> With ->", data)
-    this.server.emit('Bio:ChangeAction', data)
+  AppChangeAction(@MessageBody() message) {
+    console.log("App:ChangeAction -> Emit -> Bio:ChangeAction -> With ->", message)
+    this.server.emit('Bio:ChangeAction', message)
+  }
+
+  @SubscribeMessage('App:AddFingerTemplate')
+  AppAddFingerTemplate(@MessageBody() message) {
+    console.log("App:AddFingerTemplate -> Emit -> Bio:AddFingerTemplate -> With ->", message)
+    this.server.emit('Bio:AddFingerTemplate', message)
   }
 }
