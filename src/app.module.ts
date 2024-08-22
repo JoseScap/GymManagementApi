@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { TestsModule } from './tests/tests.module';
 import { Test } from './tests/entities/test.entity';
-import { MembersModule } from './members/members.module';
 import { Member } from './members/entities/member.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CommunicationsModule } from './communications/communications.module';
+import { TestsModule } from './tests/tests.module';
+import { MembersModule } from './members/members.module';
 import { FingerprintsModule } from './fingerprints/fingerprints.module';
 import { Subscription } from './subscriptions/entities/subscription.entity';
 import { Fingerprint } from './fingerprints/entities/fingerprint.entity';
@@ -26,7 +25,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
         password: configService.get<string>('GU_DATABASE_PASSWORD'),
         entities: [Test, Member, Subscription, Fingerprint],
         synchronize: false,
-        logging: true,
+        logging: false,
         logger: 'simple-console'
       }),
       inject: [ConfigService]
@@ -34,10 +33,10 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
     TestsModule,
     MembersModule,
     SubscriptionsModule,
-    FingerprintsModule,
-    SubscriptionsModule
+    CommunicationsModule,
+    FingerprintsModule
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

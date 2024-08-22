@@ -41,4 +41,8 @@ export class CreateSubscriptedMemberRequest {
     @IsString({ message: "El campo 'status' debe ser una cadena de texto" })
     @IsNotEmpty({ message: "El campo 'status' no puede estar vacío" })
     status: ActiveMemberStatus;
+
+    @IsString({ message: 'El número de teléfono debe ser una cadena de texto.' })
+    @IsOptional()
+    fingerTemplate?: string;
 }
