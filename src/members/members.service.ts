@@ -73,10 +73,6 @@ export class MembersService {
         fingerTemplate: request.fingerTemplate,
         member: member
       });
-      console.log("request", request)
-      console.log("member", member)
-      console.log("sub", subscription)
-      console.log("fingerprint", fingerprint)
       await queryRunner.manager.save(fingerprint);
 
       // Confirmar la transacción
