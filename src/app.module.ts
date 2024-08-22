@@ -25,7 +25,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module';
         password: configService.get<string>('GU_DATABASE_PASSWORD'),
         entities: [Test, Member, Subscription, Fingerprint],
         synchronize: false,
-        logging: true,
+        logging: false,
         logger: 'simple-console'
       }),
       inject: [ConfigService]

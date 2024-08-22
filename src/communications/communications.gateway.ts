@@ -15,6 +15,16 @@ export class CommunicationsGateway implements OnGatewayConnection, OnGatewayDisc
     console.log('Client disconnected', client.id)
   }
 
+  @SubscribeMessage('App:Log')
+  AppLog(@MessageBody() message) {
+    console.log("App:Log ->", message)
+  }
+
+  @SubscribeMessage('Bio:Log')
+  BioLog(@MessageBody() message) {
+    console.log("Bio:Log ->", message)
+  }
+
   @SubscribeMessage('App:Ping')
   AppPing() {
     console.log("App:Ping -> Emit -> Bio:Ping -> Without data")
@@ -27,9 +37,27 @@ export class CommunicationsGateway implements OnGatewayConnection, OnGatewayDisc
     this.server.emit('App:Pong')
   }
 
-  @SubscribeMessage('App:ChangeStatus')
-  registerFingerprint(@MessageBody() data: ChangeStatusMessage) {
-    console.log("App:ChangeStatus -> Emit -> Bio:ChangeStatus -> With ->", data)
-    if (typeof data.value === 'boolean') this.server.emit('Bio:ChangeStatus', data)
+  @SubscribeMessage('Bio:Capture')
+  BioCapture(@MessageBody() message) {
+    console.log("Bio:Capture -> Emit -> App:Capture -> with data:", message)
+    this.server.emit('App:Capture', message)
+  }
+
+  @SubscribeMessage('Bio:ErrorMerge')
+  BioErrorMerge() {
+    console.log("Bio:ErrorMerge -> Emit -> App:ErrorMerge -> with data:")
+    this.server.emit('App:ErrorMerge')
+  }
+
+  @SubscribeMessage('Bio:Identify')
+  BioIdentify(@MessageBody() message) {
+    console.log("Bio:Identify -> Emit -> App:Identify -> with data:", message)
+    this.server.emit('App:Identify', message)
+  }
+
+  @SubscribeMessage('App:ChangeAction')
+  registerFingerprint(@MessageBody() data) {
+    console.log("App:ChangeAction -> Emit -> Bio:ChangeAction -> With ->", data)
+    this.server.emit('Bio:ChangeAction', data)
   }
 }

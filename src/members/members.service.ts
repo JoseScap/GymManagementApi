@@ -10,6 +10,7 @@ import { RemoveRestoreMemberOptions } from './dto/service/remove-restore.dto';
 import { ActiveMemberStatus, MemberStatus } from './enums/member.enum';
 import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 import { CreateSubscriptedMemberRequest } from './dto/request/create-subscripted-member.request';
+import { Fingerprint } from 'src/fingerprints/entities/fingerprint.entity';
 
 @Injectable()
 export class MembersService {
@@ -18,6 +19,8 @@ export class MembersService {
     private memberRepository: Repository<Member>,
     @InjectRepository(Subscription)
     private subscriptionRepository: Repository<Subscription>,
+    @InjectRepository(Fingerprint)
+    private fingerprintsRepository: Repository<Fingerprint>,
     private dataSource: DataSource
   ) { }
 
@@ -64,6 +67,17 @@ export class MembersService {
         member: member,  
       });
       await queryRunner.manager.save(subscription);
+
+      // Crear una nueva huella para el miembro
+      const fingerprint = this.fingerprintsRepository.create({
+        fingerTemplate: request.fingerTemplate,
+        member: member
+      });
+      console.log("request", request)
+      console.log("member", member)
+      console.log("sub", subscription)
+      console.log("fingerprint", fingerprint)
+      await queryRunner.manager.save(fingerprint);
 
       // Confirmar la transacción
       await queryRunner.commitTransaction();
