@@ -4,16 +4,16 @@ import { Test } from './tests/entities/test.entity';
 import { Member } from './members/entities/member.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CommunicationsModule } from './communications/communications.module';
-import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { TestsModule } from './tests/tests.module';
+import { MembersModule } from './members/members.module';
 import { FingerprintsModule } from './fingerprints/fingerprints.module';
 import { Subscription } from './subscriptions/entities/subscription.entity';
 import { Fingerprint } from './fingerprints/entities/fingerprint.entity';
-import { TestsModule } from './tests/tests.module';
-import { MembersModule } from './members/members.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: async (configService: ConfigService) => ({

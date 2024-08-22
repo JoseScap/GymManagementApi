@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, JoinColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
 import { PaymentMethod } from "../enums/subscription.enum";
 import { Member } from "src/members/entities/member.entity";
 import { ActiveMemberStatus } from "src/members/enums/member.enum";

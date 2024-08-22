@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, CreateDateColumn, UpdateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, OneToMany, CreateDateColumn, UpdateDateColumn, JoinColumn } from "typeorm";
 import { MemberStatus } from "../enums/member.enum";
 import { Subscription } from "src/subscriptions/entities/subscription.entity";
 import { Fingerprint } from "src/fingerprints/entities/fingerprint.entity";
