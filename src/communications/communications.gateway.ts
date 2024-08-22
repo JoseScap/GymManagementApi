@@ -1,6 +1,6 @@
 import { MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import { AppRegisterFingerprint } from './dto/input/app-register-fingerprint';
+import { ChangeStatusMessage } from './dto/input/change-status-message';
 
 @WebSocketGateway()
 export class CommunicationsGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -17,18 +17,19 @@ export class CommunicationsGateway implements OnGatewayConnection, OnGatewayDisc
 
   @SubscribeMessage('App:Ping')
   AppPing() {
-    console.log("App:Ping emit Bio:Ping")
-    this.server.emit('Bio:Ping', { data: true })
+    console.log("App:Ping -> Emit -> Bio:Ping -> Without data")
+    this.server.emit('Bio:Ping')
   }
 
   @SubscribeMessage('Bio:Pong')
-  BioPong(@MessageBody() data) {
-    console.log("Bio:Pong emit App:Pong")
-    this.server.emit('App:Pong', data)
+  BioPong() {
+    console.log("Bio:Pong -> Emit -> App:Pong -> Without data")
+    this.server.emit('App:Pong')
   }
 
-  @SubscribeMessage('App:RegisterFingerprint')
-  registerFingerprint(@MessageBody() data: AppRegisterFingerprint) {
-    if (typeof data.value === 'boolean') this.server.emit('Bio:RegisterFingerprint', data)
+  @SubscribeMessage('App:ChangeStatus')
+  registerFingerprint(@MessageBody() data: ChangeStatusMessage) {
+    console.log("App:ChangeStatus -> Emit -> Bio:ChangeStatus -> With ->", data)
+    if (typeof data.value === 'boolean') this.server.emit('Bio:ChangeStatus', data)
   }
 }
