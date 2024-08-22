@@ -152,7 +152,8 @@ export class MembersService {
     
     member = await this.memberRepository.findOne({
       where: { fingerprint: { id } },
-      relations: { fingerprint: true }
+      relations: { fingerprint: true, subscriptions: true },
+      order: { subscriptions: { createdAt: 'DESC' } }
     })
   
     return member
