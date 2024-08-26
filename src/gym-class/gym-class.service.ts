@@ -22,8 +22,12 @@ export class GymClassService {
     return this.gymClassRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} gymClass`;
+  async findOne(id: string): Promise<GymClass> {
+    const gymClass = await this.gymClassRepository.findOneBy({ id });
+    if (!gymClass) {
+      throw new NotFoundException(`Gym class with ID ${id} not found`);
+    }
+    return gymClass;
   }
 
   async update(id: string, updateGymClassRequest: UpdateGymClassRequest): Promise<void> {

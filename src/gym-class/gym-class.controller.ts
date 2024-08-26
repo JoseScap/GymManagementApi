@@ -4,6 +4,7 @@ import { CreateGymClassRequest } from './dto/request/create-gymClass.request';
 import { CreateOneGymClassResponse } from './dto/response/create-gymClass.response';
 import { RemoveGymClassResponse } from './dto/response/remove-gymClass.response';
 import { UpdateGymClassRequest } from './dto/request/update-gymClass.request';
+import { FindOneGymClass } from './dto/response/findOne-gymClass.response';
 
 @Controller('classes')
 export class GymClassController {
@@ -20,9 +21,10 @@ export class GymClassController {
     return this.gymClassService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.gymClassService.findOne(+id);
+  @Get('find-one/:id')
+  async findOne(@Param('id') id: string): Promise<FindOneGymClass> {
+    const data = await this.gymClassService.findOne(id);
+    return { data }
   }
 
   @Patch('update/:id')
