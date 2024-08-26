@@ -3,6 +3,7 @@ import { GymClassService } from './gym-class.service';
 import { CreateGymClassRequest } from './dto/request/create-gymClass.request';
 import { UpdateGymClassDto } from './dto/update-gym-class.dto';
 import { CreateOneGymClassResponse } from './dto/response/create-gymClass.response';
+import { RemoveGymClassResponse } from './dto/response/remove-gymClass.response';
 
 @Controller('classes')
 export class GymClassController {
@@ -29,8 +30,15 @@ export class GymClassController {
     return this.gymClassService.update(+id, updateGymClassDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.gymClassService.remove(+id);
+  @Delete('remove/:id')
+  async remove(@Param('id') id: string): Promise<RemoveGymClassResponse> {
+    await this.gymClassService.removeOrRestore({ id, changeTo: true });
+    return { data: null }
+  }
+
+  @Delete('restore/:id')
+  async restore(@Param('id') id: string): Promise<RemoveGymClassResponse> {
+    await this.gymClassService.removeOrRestore({ id, changeTo: false });
+    return { data: null }
   }
 }

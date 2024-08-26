@@ -30,7 +30,13 @@ export class GymClassService {
     return `This action updates a #${id} gymClass`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} gymClass`;
+  async removeOrRestore({ id, changeTo }: { id: string; changeTo: boolean }) {
+    const gymClass = await this.gymClassRepository.findOneBy({ id });
+    if (!gymClass) {
+      throw new InternalServerErrorException(`Gym class with ID ${id} not found`);
+    }
+
+    gymClass.isCanceled = changeTo;
+    await this.gymClassRepository.save(gymClass);
   }
 }
