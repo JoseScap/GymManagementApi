@@ -8,6 +8,6 @@ export class SummariesController {
     @Get()
     getToday()
     {
-        return this.summariesService.getByDate(new Date())
+        return this.summariesService.getToday()
     }
 }

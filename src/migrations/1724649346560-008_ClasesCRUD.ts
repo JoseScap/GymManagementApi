@@ -9,11 +9,11 @@ export class _008ClasesCRUD1724649346560 implements MigrationInterface {
                 columns: [
                     {
                         name: "id",
-                        type: "char",
+                        type: "varchar",
                         length: "36",
                         isPrimary: true,
-                        generationStrategy: "uuid",
-                        default: "REPLACE(UUID(), '-', '')",
+                        default: "UUID()",
+                        isNullable: false,
                     },
                     {
                         name: "className",

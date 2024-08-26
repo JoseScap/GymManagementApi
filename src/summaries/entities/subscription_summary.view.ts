@@ -1,4 +1,4 @@
-import { Entity, ViewEntity, ViewColumn } from 'typeorm';
+import { ViewEntity, ViewColumn } from 'typeorm';
 import { PaymentMethod } from '../../subscriptions/enums/subscription.enum';
 
 @ViewEntity({
