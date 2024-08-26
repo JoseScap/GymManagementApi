@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { GymClassService } from './gym-class.service';
 import { CreateGymClassRequest } from './dto/request/create-gymClass.request';
 import { CreateOneGymClassResponse } from './dto/response/create-gymClass.response';
 import { RemoveGymClassResponse } from './dto/response/remove-gymClass.response';
 import { UpdateGymClassRequest } from './dto/request/update-gymClass.request';
 import { FindOneGymClass } from './dto/response/findOne-gymClass.response';
+import { FindPaginatedGymClassResponse } from './dto/response/find-paginated.response';
 
 @Controller('classes')
 export class GymClassController {
@@ -16,9 +17,14 @@ export class GymClassController {
     return { data: null }
   }
 
-  @Get()
-  findAll() {
-    return this.gymClassService.findAll();
+  @Get('find-paginated')
+  async findPaginated(
+    @Query('page') page: string
+  ): Promise<FindPaginatedGymClassResponse> {
+    const parsedPage = Number(page);
+    const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
+
+    return this.gymClassService.findPaginated(sanitizedPage);
   }
 
   @Get('find-one/:id')
