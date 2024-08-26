@@ -12,6 +12,8 @@ import { Fingerprint } from './fingerprints/entities/fingerprint.entity';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 import { SummariesModule } from './summaries/summaries.module';
 import { SubscriptionSummary } from './summaries/entities/subscription_summary.view';
+import { GymClassModule } from './gym-class/gym-class.module';
+import { GymClass } from './gym-class/entities/gym-class.entity';
 
 @Module({
   imports: [
@@ -25,7 +27,7 @@ import { SubscriptionSummary } from './summaries/entities/subscription_summary.v
         database: configService.get<string>('DATABASE_NAME'),
         username: configService.get<string>('GU_DATABASE_USERNAME'),
         password: configService.get<string>('GU_DATABASE_PASSWORD'),
-        entities: [Test, Member, Subscription, Fingerprint, SubscriptionSummary],
+        entities: [Test, Member, Subscription, Fingerprint, SubscriptionSummary, GymClass],
         synchronize: false,
         logging: true,
         logger: 'file'
@@ -38,6 +40,7 @@ import { SubscriptionSummary } from './summaries/entities/subscription_summary.v
     CommunicationsModule,
     FingerprintsModule,
     SummariesModule,
+    GymClassModule
   ],
   controllers: [],
   providers: [],
