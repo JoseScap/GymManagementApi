@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { GymClassService } from './gym-class.service';
 import { CreateGymClassRequest } from './dto/request/create-gymClass.request';
-import { UpdateGymClassDto } from './dto/update-gym-class.dto';
 import { CreateOneGymClassResponse } from './dto/response/create-gymClass.response';
 import { RemoveGymClassResponse } from './dto/response/remove-gymClass.response';
+import { UpdateGymClassRequest } from './dto/request/update-gymClass.request';
 
 @Controller('classes')
 export class GymClassController {
@@ -25,9 +25,10 @@ export class GymClassController {
     return this.gymClassService.findOne(+id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateGymClassDto: UpdateGymClassDto) {
-    return this.gymClassService.update(+id, updateGymClassDto);
+  @Patch('update/:id')
+  async update(@Param('id') id: string, @Body() updateGymClassRequest: UpdateGymClassRequest) {
+    await this.gymClassService.update(id, updateGymClassRequest);
+    return { data: null }
   }
 
   @Delete('remove/:id')

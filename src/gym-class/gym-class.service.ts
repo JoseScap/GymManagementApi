@@ -1,9 +1,9 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { UpdateGymClassDto } from './dto/update-gym-class.dto';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateGymClassRequest } from './dto/request/create-gymClass.request';
 import { Repository } from 'typeorm';
 import { GymClass } from './entities/gym-class.entity';
+import { UpdateGymClassRequest } from './dto/request/update-gymClass.request';
 
 @Injectable()
 export class GymClassService {
@@ -26,8 +26,14 @@ export class GymClassService {
     return `This action returns a #${id} gymClass`;
   }
 
-  update(id: number, updateGymClassDto: UpdateGymClassDto) {
-    return `This action updates a #${id} gymClass`;
+  async update(id: string, updateGymClassRequest: UpdateGymClassRequest): Promise<void> {
+    const gymClass = await this.gymClassRepository.findOneBy({ id });
+
+    if (!gymClass) {
+      throw new NotFoundException(`Gym class with ID ${id} not found`);
+    }
+
+    await this.gymClassRepository.save({ ...gymClass, ...updateGymClassRequest });
   }
 
   async removeOrRestore({ id, changeTo }: { id: string; changeTo: boolean }) {
