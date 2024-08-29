@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { SummariesService } from './summaries.service';
 
 @Controller('summaries')
@@ -9,5 +9,11 @@ export class SummariesController {
     getToday()
     {
         return this.summariesService.getToday()
+    }
+
+    @Post()
+    signToday()
+    {
+        return this.summariesService.signToday();    
     }
 }
