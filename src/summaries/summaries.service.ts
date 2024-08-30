@@ -7,6 +7,7 @@ import { Summary } from './entities/summary.entity';
 import { getDate, getMonth, getWeek, getYear } from 'date-fns';
 import { GymClass } from 'src/gym-class/entities/gym-class.entity';
 import { GroupedGgccSummary } from './entities/grouped_ggcc_summary.view';
+import { GroupedWeekSummary } from './entities/grouped_week_summary.view';
 
 @Injectable()
 export class SummariesService {
@@ -94,7 +95,6 @@ export class SummariesService {
     }
 
     async getDay(date: Date) {
-        console.log(date)
         const summary = await this.summaryRepository.findOne({
             where: {
                 day: getDate(date),
@@ -106,6 +106,31 @@ export class SummariesService {
         if (!summary) throw new NotFoundException()
 
         return summary
+    }
+
+    async getWeek(date: Date) {
+        const summaries = await this.summaryRepository.createQueryBuilder('ss')
+            .select('SUM(ss.newMembersCount)', 'newMembersCount')
+            .addSelect('SUM(ss.newMembersIncome)', 'newMembersIncome')
+            .addSelect('SUM(ss.newMembersCanceledCount)', 'newMembersCanceledCount')
+            .addSelect('SUM(ss.newMembersCanceledIncome)', 'newMembersCanceledIncome')
+            .addSelect('SUM(ss.renewedMembersCount)', 'renewedMembersCount')
+            .addSelect('SUM(ss.renewedMembersIncome)', 'renewedMembersIncome')
+            .addSelect('SUM(ss.renewedMembersCanceledCount)', 'renewedMembersCanceledCount')
+            .addSelect('SUM(ss.renewedMembersCanceledIncome)', 'renewedMembersCanceledIncome')
+            .addSelect('SUM(ss.gymClassesCount)', 'gymClassesCount')
+            .addSelect('SUM(ss.gymClassesIncome)', 'gymClassesIncome')
+            .addSelect('SUM(ss.gymClassesCanceledCount)', 'gymClassesCanceledCount')
+            .addSelect('SUM(ss.gymClassesCanceledIncome)', 'gymClassesCanceledIncome')
+            .addSelect('SUM(ss.totalIncome)', 'totalIncome')
+            .addSelect('SUM(ss.totalCanceled)', 'totalCanceled')
+            .addSelect('SUM(ss.totalAmount)', 'totalAmount')
+            .groupBy('CONCAT(ss.year, ss.week)')
+            .getRawMany<GroupedWeekSummary>()
+
+        if (summaries === null) throw new NotFoundException()
+
+        return summaries[0] ?? []
     }
     
     async signToday() {

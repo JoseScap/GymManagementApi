@@ -19,6 +19,14 @@ export class SummariesController {
         return this.summariesService.getDay(new Date(day))
     }
 
+    @Get('week')
+    getWeek(@Query('day') day: string)
+    {
+        if (!day) throw new BadRequestException('Parameter day is required')
+
+        return this.summariesService.getWeek(new Date(day))
+    }
+
     @Post()
     signToday()
     {
