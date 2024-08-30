@@ -25,6 +25,7 @@ export class MembersController {
   @Post('create-one-with-sub')
   async createOneWithSub(@Body() request: CreateSubscriptedMemberRequest): Promise<CreateSubscriptedMemberResponse> {
     const result = await this.membersService.createOneWithSub(request);
+    console.log({ data: result })
     return { data: result }
   }
 

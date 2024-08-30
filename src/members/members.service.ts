@@ -69,17 +69,20 @@ export class MembersService {
       await queryRunner.manager.save(subscription);
 
       // Crear una nueva huella para el miembro
-      const fingerprint = this.fingerprintsRepository.create({
-        fingerTemplate: request.fingerTemplate,
-        member: member
-      });
-      await queryRunner.manager.save(fingerprint);
+      if (!!request.fingerTemplate) {
+        const fingerprint = this.fingerprintsRepository.create({
+          fingerTemplate: request.fingerTemplate,
+          member: member
+        });
+        await queryRunner.manager.save(fingerprint);
+        result = fingerprint
+      }
 
       // Confirmar la transacción
       await queryRunner.commitTransaction();
-      result = fingerprint
     } catch (error) {
       // Si ocurre un error, revertir la transacción
+      result = null
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
