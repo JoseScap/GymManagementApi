@@ -10,8 +10,11 @@ import { FingerprintsModule } from './fingerprints/fingerprints.module';
 import { Subscription } from './subscriptions/entities/subscription.entity';
 import { Fingerprint } from './fingerprints/entities/fingerprint.entity';
 import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { SummariesModule } from './summaries/summaries.module';
+import { SubscriptionSummary } from './summaries/entities/subscription_summary.view';
 import { GymClassModule } from './gym-class/gym-class.module';
 import { GymClass } from './gym-class/entities/gym-class.entity';
+import { GymClassSummary } from './summaries/entities/gym_class_summary.view';
 
 @Module({
   imports: [
@@ -25,10 +28,10 @@ import { GymClass } from './gym-class/entities/gym-class.entity';
         database: configService.get<string>('DATABASE_NAME'),
         username: configService.get<string>('GU_DATABASE_USERNAME'),
         password: configService.get<string>('GU_DATABASE_PASSWORD'),
-        entities: [Test, Member, Subscription, Fingerprint, GymClass],
+        entities: [Test, Member, Subscription, Fingerprint, GymClass, SubscriptionSummary, GymClassSummary],
         synchronize: false,
-        logging: false,
-        logger: 'simple-console'
+        logging: true,
+        logger: 'file'
       }),
       inject: [ConfigService]
     }),
@@ -37,6 +40,7 @@ import { GymClass } from './gym-class/entities/gym-class.entity';
     SubscriptionsModule,
     CommunicationsModule,
     FingerprintsModule,
+    SummariesModule,
     GymClassModule
   ],
   controllers: [],
