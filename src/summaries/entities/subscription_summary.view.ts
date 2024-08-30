@@ -21,6 +21,9 @@ export class SubscriptionSummary {
     amount: number;
 
     @ViewColumn()
+    isCanceled: boolean;
+
+    @ViewColumn()
     paymentMethod: PaymentMethod;
 
     @ViewColumn({ name: 'previous_count' })
