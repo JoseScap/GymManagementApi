@@ -90,7 +90,7 @@ export class SummariesService {
             gymClassesIncome: +(gymClasses[0]?.total ?? 0),
             gymClassesCanceledCount: +(canceledGymClasses[0]?.count ?? 0),
             gymClassesCanceledIncome: +(canceledGymClasses[0]?.total ?? 0),
-            totalIncome: (+newSubs[0].totalAmount) + (+renewals[0].totalAmount) + (+gymClasses[0].total)
+            totalIncome: (+(newSubs[0]?.totalAmount ?? 0)) + (+(renewals[0]?.totalAmount ?? 0)) + (+(gymClasses[0]?.total ?? 0))
         };
     }
 
