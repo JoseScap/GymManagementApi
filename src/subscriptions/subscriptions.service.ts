@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSubscriptionsRequest } from './dto/request/create-subscriptions.request';
 import { UpdateSubscriptionsRequest } from './dto/request/update-subscriptions.request';
 import { Subscription } from './entities/subscription.entity';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { DataSource, LessThan, QueryRunner, Repository } from 'typeorm';
 import { PER_PAGE } from 'src/common/constants';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
 import { RemoveRestoreSubscriptionsOptions } from './dto/service/remove-restore.dto';
 import { Member } from 'src/members/entities/member.entity';
 import { ActiveMemberStatus, MemberStatus } from 'src/members/enums/member.enum';
+import { Summary } from 'src/summaries/entities/summary.entity';
+import { getDate, getMonth, getYear } from 'date-fns';
+import { QueryPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 @Injectable()
 export class SubscriptionsService {
 
@@ -17,7 +20,9 @@ export class SubscriptionsService {
     private memberRepository: Repository<Member>,
     @InjectRepository(Subscription)
     private subscriptionRepository: Repository<Subscription>,
-    private dataSource: DataSource
+    @InjectRepository(Summary)
+    private summaryRepository: Repository<Summary>,
+    private dataSource: DataSource,
   ) { }
 
   async create(request: CreateSubscriptionsRequest) {
@@ -122,13 +127,109 @@ export class SubscriptionsService {
   }
 
   async removeOrRestore({ changeTo, id }: RemoveRestoreSubscriptionsOptions): Promise<void> {
+    // Buscamos la suscripción por su ID
     const subscription = await this.subscriptionRepository.findOneBy({ id });
-
-    if(!subscription) {
+  
+    // Si no se encuentra la suscripción, lanzamos una excepción
+    if (!subscription) {
       throw new NotFoundException(`Subscription #${id} not found`);
     }
 
-    // Definir si esto será un removeOrRestore como en el de members
-    await this.subscriptionRepository.update(id, { isCanceled: changeTo });
+    const previousSubsCount = await this.subscriptionRepository.count({
+      where: {
+        memberId: subscription.memberId,
+        createdAt: LessThan(subscription.createdAt),
+      },
+    });
+  
+    // Buscamos el resumen (summary) correspondiente a la fecha de creación de la suscripción
+    const summary = await this.summaryRepository.findOne({
+      where: {
+        day: getDate(subscription.createdAt),
+        month: getMonth(subscription.createdAt) + 1,
+        year: getYear(subscription.createdAt),
+      },
+    });
+  
+    // Si no existe un summary, solo actualizamos la suscripción y salimos
+    if (!summary) {
+      await this.subscriptionRepository.update(id, { isCanceled: changeTo });
+      return;
+    }
+  
+    // Si existe un summary, necesitamos realizar ambas modificaciones dentro de una transacción
+    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+  
+    // Iniciar la transacción
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+  
+    try {
+      // Actualizamos la suscripción para cambiar el estado de cancelación
+      await queryRunner.manager.update(Subscription, id, { isCanceled: changeTo });
+  
+      // Marcamos el summary como modificado
+      const options: QueryPartialEntity<Summary> = {
+        isModified: true
+      }
+
+      if (previousSubsCount >= 1 && changeTo === true) {
+        // Counts
+        options.renewedMembersCount = +summary.renewedMembersCount - 1
+        options.renewedMembersCanceledCount = +summary.renewedMembersCanceledCount + 1
+        // Incomes
+        options.renewedMembersIncome = +summary.renewedMembersIncome - subscription.amount
+        options.renewedMembersCanceledIncome = +summary.renewedMembersCanceledIncome + subscription.amount
+        // Totals
+        options.totalIncome = +summary.totalIncome - subscription.amount
+        options.totalCanceled = +summary.totalCanceled + subscription.amount
+        options.totalAmount = +summary.totalIncome - subscription.amount
+      } else if (previousSubsCount >= 1 && changeTo === false) {
+        // Counts
+        options.renewedMembersCount = +summary.renewedMembersCount + 1
+        options.renewedMembersCanceledCount = +summary.renewedMembersCanceledCount - 1
+        // Incomes
+        options.renewedMembersIncome = +summary.renewedMembersIncome + subscription.amount
+        options.renewedMembersCanceledIncome = +summary.renewedMembersCanceledIncome - subscription.amount
+        // Totals
+        options.totalIncome = +summary.totalIncome + subscription.amount
+        options.totalCanceled = +summary.totalCanceled - subscription.amount
+        options.totalAmount = +summary.totalIncome + subscription.amount
+      } else if (previousSubsCount === 0 && changeTo === true) {
+        // Counts
+        options.newMembersCount = +summary.newMembersCount - 1
+        options.newMembersCanceledCount = +summary.newMembersCanceledCount + 1
+        // Incomes
+        options.newMembersIncome = +summary.newMembersIncome - subscription.amount
+        options.newMembersCanceledIncome = +summary.newMembersCanceledIncome + subscription.amount
+        // Totals
+        options.totalIncome = +summary.totalIncome - subscription.amount
+        options.totalCanceled = +summary.totalCanceled + subscription.amount
+        options.totalAmount = +summary.totalIncome - subscription.amount
+      } else if (previousSubsCount === 0 && changeTo === false) {
+        // Counts
+        options.newMembersCount = +summary.newMembersCount + 1
+        options.newMembersCanceledCount = +summary.newMembersCanceledCount - 1
+        // Incomes
+        options.newMembersIncome = +summary.newMembersIncome + subscription.amount
+        options.newMembersCanceledIncome = +summary.newMembersCanceledIncome - subscription.amount
+        // Totals
+        options.totalIncome = +summary.totalIncome + subscription.amount
+        options.totalCanceled = +summary.totalCanceled - subscription.amount
+        options.totalAmount = +summary.totalIncome + subscription.amount
+      }
+
+      await queryRunner.manager.update(Summary, summary.id, options);
+  
+      // Confirmamos la transacción
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      // Si hay un error, revertimos la transacción
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      // Finalmente, liberamos el queryRunner
+      await queryRunner.release();
+    }
   }
 }

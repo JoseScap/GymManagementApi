@@ -4,9 +4,17 @@ import { SubscriptionsService } from './subscriptions.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Subscription } from './entities/subscription.entity';
 import { Member } from 'src/members/entities/member.entity';
+import { Summary } from 'src/summaries/entities/summary.entity';
+import { SummariesService } from 'src/summaries/summaries.service';
+import { GymClass } from 'src/gym-class/entities/gym-class.entity';
+import { SubscriptionSummary } from 'src/summaries/entities/subscription_summary.view';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Subscription]), TypeOrmModule.forFeature([Member])],
+  imports: [
+    TypeOrmModule.forFeature([Subscription]),
+    TypeOrmModule.forFeature([Member]),
+    TypeOrmModule.forFeature([Summary]),
+  ],
   controllers: [SubscriptionsController],
   providers: [SubscriptionsService],
 })
