@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { CreateSubscriptionsRequest } from './dto/request/create-subscriptions.request';
 import { UpdateSubscriptionsRequest } from './dto/request/update-subscriptions.request';
 import { Subscription } from './entities/subscription.entity';
-import { DataSource, QueryRunner, Repository } from 'typeorm';
+import { DataSource, Like, QueryRunner, Repository } from 'typeorm';
 import { PER_PAGE } from 'src/common/constants';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
 import { RemoveRestoreSubscriptionsOptions } from './dto/service/remove-restore.dto';
@@ -131,4 +131,142 @@ export class SubscriptionsService {
     // Definir si esto será un removeOrRestore como en el de members
     await this.subscriptionRepository.update(id, { isCanceled: changeTo });
   }
+
+  async findByName(page: number, name: string) {
+    let data: Subscription[]
+    if (!(page < 1)) page = 1
+    const items = await this.subscriptionRepository.count({
+      where: {
+        member: {
+          fullName: Like(`%${name}%`)
+        }
+      }
+    });
+
+    const first = items > 0 ? 1 : 0
+    const prev: number | null = page === 1 || first === 0 ? null : page - 1;
+
+    const last = Math.ceil(items / PER_PAGE);
+
+    const next: number | null = page >= last ? null : page + 1;
+
+    const pages = last;
+
+    data = await this.subscriptionRepository.find({
+      where: {
+        member: {
+          fullName: Like(`%${name}%`)
+        }
+      },
+      skip: (page - 1) * PER_PAGE,
+      take: PER_PAGE,
+      order: {
+        createdAt: 'DESC'
+      },
+      relations: { member: true }
+    });
+
+    return {
+      first,
+      prev,
+      next,
+      last,
+      pages,
+      items,
+      data
+    }
+  }
+
+  async findByDni(page: number, dni: string) {
+    let subscriptions: Subscription[];
+
+    if (!(page < 1)) page = 1;
+
+    const items = await this.subscriptionRepository.count({
+      where: {
+        member: {
+          dni: Like(`%${dni}%`)
+        }
+      }
+    });
+
+    const first: number = items > 0 ? 1 : 0;
+    const prev: number = page === 1 || first === 0 ? null : page - 1;
+
+    const last: number = Math.ceil(items / PER_PAGE);
+
+    const next: number | null = page >= last ? null : page + 1;
+
+    const pages = last;
+
+    const data = await this.subscriptionRepository.find({
+      where: {
+        member: {
+          dni: Like(`%${dni}%`)
+        }
+      },
+      skip: (page - 1) * PER_PAGE,
+      take: PER_PAGE,
+      order: {
+        createdAt: 'DESC'
+      },
+      relations: { member: true }
+    });
+
+    return {
+      first,
+      prev,
+      next,
+      last,
+      pages,
+      items,
+      data
+    }
+  }
+
+  async findByDate(page: number, dateFrom: Date, dateTo: Date){
+    let subscriptions: Subscription[];
+
+    if (!(page < 1)) page = 1;
+
+    const items = await this.subscriptionRepository.count({
+      where: {
+        dateFrom: Like(dateFrom),
+        dateTo: Like(dateTo)
+      }
+    });
+
+    const first: number = items > 0 ? 1 : 0;
+    const prev: number = page === 1 || first === 0 ? null : page - 1;
+
+    const last: number = Math.ceil(items / PER_PAGE);
+
+    const next: number | null = page >= last ? null : page + 1;
+
+    const pages = last;
+
+    const data = await this.subscriptionRepository.find({
+      where: {
+        dateFrom: Like(dateFrom),
+        dateTo: Like(dateTo)
+      },
+      skip: (page - 1) * PER_PAGE,
+      take: PER_PAGE,
+      order: {
+        createdAt: 'DESC'
+      },
+      relations: { member: true }
+    });
+
+    return {
+      first,
+      prev,
+      next,
+      last,
+      pages,
+      items,
+      data
+    }
+  }
+
 }

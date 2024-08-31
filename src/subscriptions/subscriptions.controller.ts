@@ -8,8 +8,6 @@ import { RestoreSubscriptionResponse } from './dto/response/restore-subscription
 import { RemoveSubscriptionResponse } from './dto/response/remove-subscription.response';
 import { UpdateSubscriptionsResponse } from './dto/response/update-subscription.response';
 import { FindPaginatedSubscriptionsResponse } from './dto/response/find-paginated.response';
-import { MemberStatus } from 'src/members/enums/member.enum';
-
 @Controller('subscriptions')
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
@@ -29,6 +27,35 @@ export class SubscriptionsController {
     const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
 
     return this.subscriptionsService.findPaginated(sanitizedPage, embedMember)
+  }
+
+  @Get('find-by-name/:name')
+  async findByName(
+    @Param('name') name: string, 
+    @Query('page') page: string
+  ): Promise<FindPaginatedSubscriptionsResponse> {
+    const data = await this.subscriptionsService.findByName(+page, name);
+    return data
+  }
+  
+
+  @Get('find-by-dni/:dni')
+  async findByDni(
+    @Param('dni') dni: string,
+    @Query('page') page: string
+  ): Promise<FindPaginatedSubscriptionsResponse> {
+    const data = await this.subscriptionsService.findByDni(+page, dni);
+    return data
+  }
+
+  @Get('find-by-date/:dateFrom/:dateTo')
+  async findByDate(
+    @Param('dateFrom') dateFrom: Date,
+    @Param('dateTo') dateTo: Date,
+    @Query('page') page: string
+  ): Promise<FindPaginatedSubscriptionsResponse> {
+    const data = await this.subscriptionsService.findByDate(+page, dateFrom, dateTo);
+    return data
   }
 
   @Get('fina-one/:id')
