@@ -29,35 +29,6 @@ export class SubscriptionsController {
     return this.subscriptionsService.findPaginated(sanitizedPage, embedMember)
   }
 
-  @Get('find-by-name/:name')
-  async findByName(
-    @Param('name') name: string, 
-    @Query('page') page: string
-  ): Promise<FindPaginatedSubscriptionsResponse> {
-    const data = await this.subscriptionsService.findByName(+page, name);
-    return data
-  }
-  
-
-  @Get('find-by-dni/:dni')
-  async findByDni(
-    @Param('dni') dni: string,
-    @Query('page') page: string
-  ): Promise<FindPaginatedSubscriptionsResponse> {
-    const data = await this.subscriptionsService.findByDni(+page, dni);
-    return data
-  }
-
-  @Get('find-by-date/:dateFrom/:dateTo')
-  async findByDate(
-    @Param('dateFrom') dateFrom: Date,
-    @Param('dateTo') dateTo: Date,
-    @Query('page') page: string
-  ): Promise<FindPaginatedSubscriptionsResponse> {
-    const data = await this.subscriptionsService.findByDate(+page, dateFrom, dateTo);
-    return data
-  }
-
   @Get('fina-one/:id')
   async findOne(
     @Param('id') id: string,
