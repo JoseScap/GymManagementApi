@@ -1,17 +1,23 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateGymClassRequest } from './dto/request/create-gymClass.request';
-import { Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { GymClass } from './entities/gym-class.entity';
 import { UpdateGymClassRequest } from './dto/request/update-gymClass.request';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
 import { PER_PAGE } from 'src/common/constants';
+import { Summary } from 'src/summaries/entities/summary.entity';
+import { getDate, getMonth, getYear } from 'date-fns';
+import { QueryPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 
 @Injectable()
 export class GymClassService {
   constructor(
     @InjectRepository(GymClass)
     private gymClassRepository: Repository<GymClass>,
+    @InjectRepository(Summary)
+    private summaryRepository: Repository<Summary>,
+    private dataSource: DataSource,
   ) {}
 
   async create(request: CreateGymClassRequest): Promise<string> {
@@ -77,7 +83,72 @@ export class GymClassService {
       throw new InternalServerErrorException(`Gym class with ID ${id} not found`);
     }
 
-    gymClass.isCanceled = changeTo;
-    await this.gymClassRepository.save(gymClass);
+    // Buscamos el resumen (summary) correspondiente a la fecha de creación de la suscripción
+    const summary = await this.summaryRepository.findOne({
+      where: {
+        day: getDate(gymClass.createdAt),
+        month: getMonth(gymClass.createdAt) + 1,
+        year: getYear(gymClass.createdAt),
+      },
+    });
+
+    // Si no existe un summary, solo actualizamos la suscripción y salimos
+    if (!summary) {
+      await this.gymClassRepository.update(id, { isCanceled: changeTo });
+      return;
+    }
+
+    // Si existe un summary, necesitamos realizar ambas modificaciones dentro de una transacción
+    const queryRunner: QueryRunner = this.dataSource.createQueryRunner();
+
+    // Iniciar la transacción
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      // Actualizamos la suscripción para cambiar el estado de cancelación
+      await queryRunner.manager.update(GymClass, id, { isCanceled: changeTo });
+  
+      // Marcamos el summary como modificado
+      const options: QueryPartialEntity<Summary> = {
+        isModified: true
+      }
+
+      if (changeTo === true) {
+        // Counts
+        options.gymClassesCount = +summary.gymClassesCount - 1
+        options.gymClassesCanceledCount = +summary.gymClassesCanceledCount + 1
+        // Incomes
+        options.gymClassesIncome = +summary.gymClassesIncome - gymClass.total
+        options.gymClassesCanceledIncome = +summary.gymClassesCanceledIncome + gymClass.total
+        // Totals
+        options.totalIncome = +summary.totalIncome - gymClass.total
+        options.totalCanceled = +summary.totalCanceled + gymClass.total
+        options.totalAmount = +summary.totalIncome - gymClass.total
+      } else if (changeTo === false) {
+        // Counts
+        options.gymClassesCount = +summary.gymClassesCount + 1
+        options.gymClassesCanceledCount = +summary.gymClassesCanceledCount - 1
+        // Incomes
+        options.gymClassesIncome = +summary.gymClassesIncome + gymClass.total
+        options.gymClassesCanceledIncome = +summary.gymClassesCanceledIncome - gymClass.total
+        // Totals
+        options.totalIncome = +summary.totalIncome + gymClass.total
+        options.totalCanceled = +summary.totalCanceled - gymClass.total
+        options.totalAmount = +summary.totalIncome + gymClass.total
+      }
+
+      await queryRunner.manager.update(Summary, summary.id, options);
+  
+      // Confirmamos la transacción
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      // Si hay un error, revertimos la transacción
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      // Finalmente, liberamos el queryRunner
+      await queryRunner.release();
+    }
   }
 }
