@@ -37,7 +37,7 @@ async function bootstrap() {
   const corsOrigin = configService.get<string>('CORS_ORIGIN');
   const corsMethods = configService.get<string>('CORS_METHODS');
 
-  app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalPipes(new ValidationPipe({ transform: true }))
   app.enableCors({
     origin: corsOrigin,
     methods: corsMethods
