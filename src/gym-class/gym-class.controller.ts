@@ -33,6 +33,33 @@ export class GymClassController {
     return { data }
   }
 
+  @Get('find-by-name/:className')
+  async findByName(
+    @Param('className') className: string,
+    @Query('page') page: string
+  ): Promise<FindPaginatedGymClassResponse> {
+    const data = await this.gymClassService.findByName(+page, className);
+    return data
+  }
+
+  @Get('find-by-date/:date')
+  async findByDate(
+    @Param('date') date: Date,
+    @Query('page') page: string
+  ): Promise<FindPaginatedGymClassResponse> {
+    const data = await this.gymClassService.findByDate(+page, date);
+    return data
+  }
+
+  @Get('find-by-professor/:professor')
+  async findByProfessor(
+    @Param('professor') professor: string,
+    @Query('page') page: string
+  ): Promise<FindPaginatedGymClassResponse> {
+    const data = await this.gymClassService.findByProfessor(+page, professor);
+    return data
+  }
+
   @Patch('update/:id')
   async update(@Param('id') id: string, @Body() updateGymClassRequest: UpdateGymClassRequest) {
     await this.gymClassService.update(id, updateGymClassRequest);
