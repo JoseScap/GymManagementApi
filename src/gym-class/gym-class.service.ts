@@ -5,11 +5,14 @@ import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { GymClass } from './entities/gym-class.entity';
 import { UpdateGymClassRequest } from './dto/request/update-gymClass.request';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
-import { PER_PAGE } from 'src/common/constants';
+import { PER_PAGE, WEEK_STARTS_ON } from 'src/common/constants';
 import { Summary } from 'src/summaries/entities/summary.entity';
-import { getDate, getMonth, getYear } from 'date-fns';
+import { getDate, getMonth, getWeek, getYear } from 'date-fns';
 import { QueryPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
 import { FindPaginatedOptions } from './types/service-options';
+import { GroupedSubSummary } from 'src/summaries/entities/grouped_sub_summary.view';
+import { GroupedGgccSummary } from 'src/summaries/entities/grouped_ggcc_summary.view';
+import { SubscriptionSummary } from 'src/summaries/entities/subscription_summary.view';
 
 @Injectable()
 export class GymClassService {
@@ -18,6 +21,8 @@ export class GymClassService {
     private gymClassRepository: Repository<GymClass>,
     @InjectRepository(Summary)
     private summaryRepository: Repository<Summary>,
+    @InjectRepository(SubscriptionSummary)
+    private subSummaryRepository: Repository<SubscriptionSummary>,
     private dataSource: DataSource,
   ) {}
 
@@ -117,6 +122,200 @@ export class GymClassService {
     return gymClass;
   }
 
+  async getSign(date: Date) {
+    const newSubs = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count = 1')
+        .andWhere('ss.isCanceled = 0')
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const newCashSubs = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count = 1')
+        .andWhere('ss.isCanceled = 0')
+        .andWhere("ss.paymentMethod = 'Efectivo'")
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const newTransferSubs = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count = 1')
+        .andWhere('ss.isCanceled = 0')
+        .andWhere("ss.paymentMethod = 'Transferencia'")
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const newCanceledSubs = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count = 1')
+        .andWhere('ss.isCanceled = 1')
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const newCanceledCashSubs = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count = 1')
+        .andWhere('ss.isCanceled = 1')
+        .andWhere("ss.paymentMethod = 'Efectivo'")
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const newCanceledTransferSubs = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count = 1')
+        .andWhere('ss.isCanceled = 1')
+        .andWhere("ss.paymentMethod = 'Transferencia'")
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const renewals = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count > 1')
+        .andWhere('ss.isCanceled = 0')
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const cashRenewals = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count > 1')
+        .andWhere('ss.isCanceled = 0')
+        .andWhere("ss.paymentMethod = 'Efectivo'")
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const transferRenewals = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count > 1')
+        .andWhere('ss.isCanceled = 0')
+        .andWhere("ss.paymentMethod = 'Transferencia'")
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+    
+    const canceledRenewals = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count > 1')
+        .andWhere('ss.isCanceled = 1')
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const canceledCashRenewals = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count > 1')
+        .andWhere('ss.isCanceled = 1')
+        .andWhere("ss.paymentMethod = 'Efectivo'")
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const canceledTransferRenewals = await this.subSummaryRepository.createQueryBuilder('ss')
+        .select('DATE(ss.createdAt)', 'date')
+        .addSelect('SUM(ss.amount)', 'totalAmount')
+        .addSelect('COUNT(ss.id)', 'count')
+        .where('ss.previous_count > 1')
+        .andWhere('ss.isCanceled = 1')
+        .andWhere("ss.paymentMethod = 'Transferencia'")
+        .andWhere('DATE(ss.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ss.createdAt)')
+        .getRawMany<GroupedSubSummary>();
+
+    const gymClasses = await this.gymClassRepository.createQueryBuilder('ggcc')
+        .select('DATE(ggcc.createdAt)', 'date')
+        .addSelect('SUM(ggcc.total)', 'total')
+        .addSelect('SUM(ggcc.transferTotal)', 'transferTotal')
+        .addSelect('COUNT(ggcc.id)', 'count')
+        .where('ggcc.isCanceled = 0')
+        .andWhere('DATE(ggcc.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ggcc.createdAt)')
+        .getRawMany<GroupedGgccSummary>()
+
+    const canceledGymClasses = await this.gymClassRepository.createQueryBuilder('ggcc')
+        .select('DATE(ggcc.createdAt)', 'date')
+        .addSelect('SUM(ggcc.total)', 'total')
+        .addSelect('COUNT(ggcc.id)', 'count')
+        .addSelect('SUM(ggcc.transferTotal)', 'transferTotal')
+        .where('ggcc.isCanceled = 1')
+        .andWhere('DATE(ggcc.createdAt) = DATE(:date)', { date })
+        .groupBy('DATE(ggcc.createdAt)')
+        .getRawMany<GroupedGgccSummary>()
+
+    // Cash totals
+    const newSubsCashTotal = +(newCashSubs[0]?.totalAmount ?? 0)
+    const renewalsCashTotal = +(cashRenewals[0]?.totalAmount ?? 0)
+    const gymClassesCashTotal = +(gymClasses[0]?.total ?? 0) - (+(gymClasses[0]?.transferTotal ?? 0))
+    const totalCashIncome = newSubsCashTotal + renewalsCashTotal + gymClassesCashTotal
+
+    // Transfer totals
+    const newSubsTransferTotal = +(newTransferSubs[0]?.totalAmount ?? 0)
+    const renewalsTransferTotal = +(transferRenewals[0]?.totalAmount ?? 0)
+    const gymClassesTransferTotal = +(gymClasses[0]?.transferTotal ?? 0)
+    const totalTransferIncome = newSubsTransferTotal + renewalsTransferTotal + gymClassesTransferTotal
+
+    const totalIncome = (+(newSubs[0]?.totalAmount ?? 0)) + (+(renewals[0]?.totalAmount ?? 0)) + (+(gymClasses[0]?.total ?? 0))
+
+    return {
+        newMembersCount: +(newSubs[0]?.count ?? 0),
+        newMembersIncome: +(newSubs[0]?.totalAmount ?? 0),
+        newMembersCashIncome: +(newCashSubs[0]?.totalAmount ?? 0),
+        newMembersTransferIncome: +(newTransferSubs[0]?.totalAmount ?? 0),
+        newMembersCanceledCount: +(newCanceledSubs[0]?.count ?? 0),
+        newMembersCanceledIncome: +(newCanceledSubs[0]?.totalAmount ?? 0),
+        newMembersCanceledCashIncome: +(newCanceledCashSubs[0]?.totalAmount ?? 0),
+        newMembersCanceledTransferIncome: +(newCanceledTransferSubs[0]?.totalAmount ?? 0),
+        renewedMembersCount: +(renewals[0]?.count ?? 0),
+        renewedMembersIncome: +(renewals[0]?.totalAmount ?? 0),
+        renewedMembersCashIncome: +(cashRenewals[0]?.totalAmount ?? 0),
+        renewedMembersTransferIncome: +(transferRenewals[0]?.totalAmount ?? 0),
+        renewedMembersCanceledCount: +(canceledRenewals[0]?.count ?? 0),
+        renewedMembersCanceledIncome: +(canceledRenewals[0]?.totalAmount ?? 0),
+        renewedMembersCanceledCashIncome: +(canceledCashRenewals[0]?.totalAmount ?? 0),
+        renewedMembersCanceledTransferIncome: +(canceledTransferRenewals[0]?.totalAmount ?? 0),
+        gymClassesCount: +(gymClasses[0]?.count ?? 0),
+        gymClassesIncome: +(gymClasses[0]?.total ?? 0),
+        gymClassesCashIncome: +(gymClasses[0]?.total ?? 0) - (+(gymClasses[0]?.transferTotal ?? 0)),
+        gymClassesTransferIncome: +(gymClasses[0]?.transferTotal ?? 0),
+        gymClassesCanceledCount: +(canceledGymClasses[0]?.count ?? 0),
+        gymClassesCanceledIncome: +(canceledGymClasses[0]?.total ?? 0),
+        gymClassesCanceledCashIncome: +(canceledGymClasses[0]?.total ?? 0) - (+(canceledGymClasses[0]?.transferTotal ?? 0)),
+        gymClassesCanceledTransferIncome: +(canceledGymClasses[0]?.transferTotal ?? 0),
+        totalIncome,
+        totalCashIncome,
+        totalTransferIncome
+    };
+}
+
   async update(id: string, updateGymClassRequest: UpdateGymClassRequest): Promise<void> {
     const gymClass = await this.gymClassRepository.findOneBy({ id });
 
@@ -124,7 +323,63 @@ export class GymClassService {
       throw new NotFoundException(`Gym class with ID ${id} not found`);
     }
 
+    // Buscamos el resumen (summary) correspondiente a la fecha de creación de la suscripción
+    const summary = await this.summaryRepository.findOne({
+      where: {
+        day: getDate(gymClass.createdAt),
+        month: getMonth(gymClass.createdAt) + 1,
+        year: getYear(gymClass.createdAt),
+      },
+    });
+
+    // Si no existe un summary, solo actualizamos la suscripción y salimos
     await this.gymClassRepository.update(gymClass, updateGymClassRequest);
+    if (!summary) {
+      return;
+    }
+
+    try {
+      const newSign = await this.getSign(gymClass.createdAt);
+      await this.summaryRepository.update(summary, {
+        day: getDate(gymClass.createdAt),
+        week: getWeek(gymClass.createdAt, { weekStartsOn: WEEK_STARTS_ON }),
+        month: getMonth(gymClass.createdAt) + 1,
+        year: getYear(gymClass.createdAt),
+        newMembersCount: newSign.newMembersCount,
+        newMembersIncome: newSign.newMembersIncome,
+        newMembersCashIncome: newSign.newMembersCashIncome,
+        newMembersTransferIncome: newSign.newMembersTransferIncome,
+        newMembersCanceledCount: newSign.newMembersCanceledCount,
+        newMembersCanceledIncome: newSign.newMembersCanceledIncome,
+        newMembersCanceledCashIncome: newSign.newMembersCanceledCashIncome,
+        newMembersCanceledTransferIncome: newSign.newMembersCanceledTransferIncome,
+        renewedMembersCount: newSign.renewedMembersCount,
+        renewedMembersIncome: newSign.renewedMembersIncome,
+        renewedMembersCashIncome: newSign.renewedMembersCashIncome,
+        renewedMembersTransferIncome: newSign.renewedMembersTransferIncome,
+        renewedMembersCanceledCount: newSign.renewedMembersCanceledCount,
+        renewedMembersCanceledIncome: newSign.renewedMembersCanceledIncome,
+        renewedMembersCanceledCashIncome: newSign.renewedMembersCanceledCashIncome,
+        renewedMembersCanceledTransferIncome: newSign.renewedMembersCanceledTransferIncome,
+        gymClassesCount: newSign.gymClassesCount,
+        gymClassesIncome: newSign.gymClassesIncome,
+        gymClassesCashIncome: newSign.gymClassesCashIncome,
+        gymClassesTransferIncome: newSign.gymClassesTransferIncome,
+        gymClassesCanceledCount: newSign.gymClassesCanceledCount,
+        gymClassesCanceledIncome: newSign.gymClassesCanceledIncome,
+        gymClassesCanceledCashIncome: newSign.gymClassesCanceledCashIncome,
+        gymClassesCanceledTransferIncome: newSign.gymClassesCanceledTransferIncome,
+        totalCanceled: newSign.newMembersCanceledIncome + newSign.renewedMembersCanceledIncome + newSign.gymClassesCanceledIncome,
+        totalIncome: newSign.totalIncome,
+        totalCashIncome: newSign.totalCashIncome,
+        totalTransferIncome: newSign.totalTransferIncome,
+        totalAmount: newSign.newMembersIncome + newSign.renewedMembersIncome + newSign.gymClassesIncome,
+      })
+    } catch (error) {
+      // Si hay un error, revertimos la transacción
+      console.log(error);
+    }
+
   }
 
   async removeOrRestore({ id, changeTo }: { id: string; changeTo: boolean }) {

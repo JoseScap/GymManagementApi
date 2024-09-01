@@ -347,7 +347,7 @@ export class SubscriptionsService {
         totalCashIncome,
         totalTransferIncome
     };
-}
+  }
 
   async update(id: string, updateSubscriptionsDto: UpdateSubscriptionsRequest): Promise<void> {
     const subscription = await this.subscriptionRepository.findOneBy({ id });
