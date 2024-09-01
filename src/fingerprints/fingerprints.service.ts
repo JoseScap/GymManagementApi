@@ -13,9 +13,9 @@ export class FingerprintsService {
     private repository: Repository<Fingerprint>
   ) { }
 
-  async create(createOneRequest: CreateOneFingerprintRequest): Promise<void> {
+  async create(createOneRequest: CreateOneFingerprintRequest): Promise<Fingerprint> {
     const newFingerTemplate = this.repository.create(createOneRequest)
-    await this.repository.save(newFingerTemplate)
+    return await this.repository.save(newFingerTemplate)
   }
 
   async findPaginated(page: number): Promise<PaginatedApiResponse<Fingerprint>> {

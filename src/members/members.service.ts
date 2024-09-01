@@ -136,10 +136,10 @@ export class MembersService {
 
   async findOne(id: string, embedSubscriptions: boolean): Promise<Member> {
     let member: Member;
-    
+
     member = await this.memberRepository.findOne({
       where: { id },
-      relations: { subscriptions: embedSubscriptions },
+      relations: { subscriptions: embedSubscriptions, fingerprint: true },
       order: { subscriptions: { createdAt: 'DESC' } }
     })
     
