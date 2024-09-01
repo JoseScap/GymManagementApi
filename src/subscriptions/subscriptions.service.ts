@@ -210,9 +210,15 @@ export class SubscriptionsService {
         options.renewedMembersCanceledCount = +summary.renewedMembersCanceledCount + 1
         // Incomes
         options.renewedMembersIncome = +summary.renewedMembersIncome - subscription.amount
+        options.renewedMembersCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.renewedMembersCashIncome - subscription.amount : +summary.renewedMembersCashIncome
+        options.renewedMembersTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.renewedMembersTransferIncome - subscription.amount : +summary.renewedMembersTransferIncome
         options.renewedMembersCanceledIncome = +summary.renewedMembersCanceledIncome + subscription.amount
+        options.renewedMembersCanceledCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.renewedMembersCanceledCashIncome + subscription.amount : +summary.renewedMembersCanceledCashIncome
+        options.renewedMembersCanceledTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.renewedMembersCanceledTransferIncome + subscription.amount : +summary.renewedMembersCanceledTransferIncome
         // Totals
         options.totalIncome = +summary.totalIncome - subscription.amount
+        options.totalCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.totalCashIncome - subscription.amount : +summary.totalCashIncome
+        options.totalTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.totalTransferIncome - subscription.amount : +summary.totalTransferIncome
         options.totalCanceled = +summary.totalCanceled + subscription.amount
         options.totalAmount = +summary.totalIncome - subscription.amount
       } else if (previousSubsCount >= 1 && changeTo === false) {
@@ -221,9 +227,15 @@ export class SubscriptionsService {
         options.renewedMembersCanceledCount = +summary.renewedMembersCanceledCount - 1
         // Incomes
         options.renewedMembersIncome = +summary.renewedMembersIncome + subscription.amount
+        options.renewedMembersCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.renewedMembersCashIncome + subscription.amount : +summary.renewedMembersCashIncome
+        options.renewedMembersTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.renewedMembersTransferIncome + subscription.amount : +summary.renewedMembersTransferIncome
         options.renewedMembersCanceledIncome = +summary.renewedMembersCanceledIncome - subscription.amount
+        options.renewedMembersCanceledCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.renewedMembersCanceledCashIncome - subscription.amount : +summary.renewedMembersCanceledCashIncome
+        options.renewedMembersCanceledTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.renewedMembersCanceledTransferIncome - subscription.amount : +summary.renewedMembersCanceledTransferIncome
         // Totals
         options.totalIncome = +summary.totalIncome + subscription.amount
+        options.totalCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.totalCashIncome + subscription.amount : +summary.totalCashIncome
+        options.totalTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.totalTransferIncome + subscription.amount : +summary.totalTransferIncome
         options.totalCanceled = +summary.totalCanceled - subscription.amount
         options.totalAmount = +summary.totalIncome + subscription.amount
       } else if (previousSubsCount === 0 && changeTo === true) {
@@ -232,9 +244,15 @@ export class SubscriptionsService {
         options.newMembersCanceledCount = +summary.newMembersCanceledCount + 1
         // Incomes
         options.newMembersIncome = +summary.newMembersIncome - subscription.amount
+        options.newMembersCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.newMembersCashIncome - subscription.amount : +summary.newMembersCashIncome
+        options.newMembersTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.newMembersTransferIncome - subscription.amount : +summary.newMembersTransferIncome
         options.newMembersCanceledIncome = +summary.newMembersCanceledIncome + subscription.amount
+        options.newMembersCanceledCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.newMembersCanceledCashIncome + subscription.amount : +summary.newMembersCanceledCashIncome
+        options.newMembersCanceledTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.newMembersCanceledTransferIncome + subscription.amount : +summary.newMembersCanceledTransferIncome
         // Totals
         options.totalIncome = +summary.totalIncome - subscription.amount
+        options.totalCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.totalCashIncome - subscription.amount : +summary.totalCashIncome
+        options.totalTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.totalTransferIncome - subscription.amount : +summary.totalTransferIncome
         options.totalCanceled = +summary.totalCanceled + subscription.amount
         options.totalAmount = +summary.totalIncome - subscription.amount
       } else if (previousSubsCount === 0 && changeTo === false) {
@@ -243,9 +261,15 @@ export class SubscriptionsService {
         options.newMembersCanceledCount = +summary.newMembersCanceledCount - 1
         // Incomes
         options.newMembersIncome = +summary.newMembersIncome + subscription.amount
+        options.newMembersCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.newMembersCashIncome + subscription.amount : +summary.newMembersCashIncome
+        options.newMembersTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.newMembersTransferIncome + subscription.amount : +summary.newMembersTransferIncome
         options.newMembersCanceledIncome = +summary.newMembersCanceledIncome - subscription.amount
+        options.newMembersCanceledCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.newMembersCanceledCashIncome - subscription.amount : +summary.newMembersCanceledCashIncome
+        options.newMembersCanceledTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.newMembersCanceledTransferIncome - subscription.amount : +summary.newMembersCanceledTransferIncome
         // Totals
         options.totalIncome = +summary.totalIncome + subscription.amount
+        options.totalCashIncome = subscription.paymentMethod === "Efectivo" ? +summary.totalCashIncome + subscription.amount : +summary.totalCashIncome
+        options.totalTransferIncome = subscription.paymentMethod === "Transferencia" ? +summary.totalTransferIncome + subscription.amount : +summary.totalTransferIncome
         options.totalCanceled = +summary.totalCanceled - subscription.amount
         options.totalAmount = +summary.totalIncome + subscription.amount
       }
