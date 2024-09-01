@@ -80,7 +80,7 @@ export class SubscriptionsService {
     }
     
     if (dateFrom && dateTo) {
-      countQuery = countQuery.andWhere('ggcc.createdAt BETWEEN :dateFrom AND :dateTo', { dateFrom, dateTo });
+      countQuery = countQuery.andWhere('ggcc.dateFrom >= :dateFrom AND ggcc.dateTo <= :dateTo', { dateFrom, dateTo });
     }
 
     const items = await countQuery.getCount();
@@ -109,7 +109,7 @@ export class SubscriptionsService {
     }
 
     if (dateFrom && dateTo) {
-      dataQuery = dataQuery.andWhere('ggcc.createdAt BETWEEN :dateFrom AND :dateTo', { dateFrom, dateTo });
+      dataQuery = dataQuery.andWhere('ggcc.dateFrom >= :dateFrom AND ggcc.dateTo <= :dateTo', { dateFrom, dateTo });
     }
 
     dataQuery = dataQuery.orderBy('ggcc.createdAt', 'DESC')

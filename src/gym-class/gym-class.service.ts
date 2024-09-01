@@ -23,7 +23,7 @@ export class GymClassService {
 
   async findPaginated({ page, className, date, professor }: FindPaginatedOptions): Promise<PaginatedApiResponse<GymClass>> {
     // Si la página es menor que 1, la establecemos en 1 para evitar paginación incorrecta
-    if (page < 1) page = 1;
+    if (!(page < 1)) page = 1;
   
     // Creamos un query builder para contar la cantidad total de elementos que coinciden con los filtros
     let countQuery = this.gymClassRepository
