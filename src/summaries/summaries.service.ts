@@ -8,6 +8,7 @@ import { getDate, getMonth, getWeek, getYear } from 'date-fns';
 import { GymClass } from 'src/gym-class/entities/gym-class.entity';
 import { GroupedGgccSummary } from './entities/grouped_ggcc_summary.view';
 import { GroupedWeekSummary } from './entities/grouped_week_summary.view';
+import { WEEK_STARTS_ON } from 'src/common/constants';
 
 @Injectable()
 export class SummariesService {
@@ -67,6 +68,7 @@ export class SummariesService {
             .addSelect('COUNT(ggcc.id)', 'count')
             .where('ggcc.isCanceled = 0')
             .groupBy('DATE(ggcc.createdAt)')
+            .having('date = DATE(CURDATE())')
             .getRawMany<GroupedGgccSummary>()
 
         const canceledGymClasses = await this.ggccRepository.createQueryBuilder('ggcc')
@@ -75,6 +77,7 @@ export class SummariesService {
             .addSelect('COUNT(ggcc.id)', 'count')
             .where('ggcc.isCanceled = 1')
             .groupBy('DATE(ggcc.createdAt)')
+            .having('date = DATE(CURDATE())')
             .getRawMany<GroupedGgccSummary>()
 
         return {
@@ -125,12 +128,13 @@ export class SummariesService {
             .addSelect('SUM(ss.totalIncome)', 'totalIncome')
             .addSelect('SUM(ss.totalCanceled)', 'totalCanceled')
             .addSelect('SUM(ss.totalAmount)', 'totalAmount')
+            .where('ss.year = :year AND ss.week = :week', { year: getYear(date), week: getWeek(date, { weekStartsOn: WEEK_STARTS_ON }) })
             .groupBy('CONCAT(ss.year, ss.week)')
             .getRawMany<GroupedWeekSummary>()
 
-        if (summaries === null) throw new NotFoundException()
+        if (summaries === null || summaries.length === 0) throw new NotFoundException()
 
-        return summaries[0] ?? []
+        return summaries[0]
     }
     
     async signToday() {
@@ -151,7 +155,7 @@ export class SummariesService {
     
         const summary = this.summaryRepository.create({
             day: getDate(currentDate),
-            week: getWeek(currentDate, { weekStartsOn: 1 }),
+            week: getWeek(currentDate, { weekStartsOn: WEEK_STARTS_ON }),
             month: getMonth(currentDate) + 1,
             year: getYear(currentDate),
             newMembersCount: data.newMembersCount,
