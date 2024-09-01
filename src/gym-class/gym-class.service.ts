@@ -170,9 +170,15 @@ export class GymClassService {
         options.gymClassesCanceledCount = +summary.gymClassesCanceledCount + 1
         // Incomes
         options.gymClassesIncome = +summary.gymClassesIncome - gymClass.total
-        options.gymClassesCanceledIncome = +summary.gymClassesCanceledIncome + gymClass.total
+        options.gymClassesCashIncome = +summary.gymClassesCashIncome - (gymClass.total - gymClass.transferTotal)
+        options.gymClassesTransferIncome = +summary.gymClassesTransferIncome - gymClass.transferTotal
+        options.gymClassesCanceledIncome = +summary.gymClassesCanceledIncome + (gymClass.total - gymClass.transferTotal)
+        options.gymClassesCanceledCashIncome = +summary.gymClassesCanceledCashIncome + gymClass.total
+        options.gymClassesCanceledTransferIncome = +summary.gymClassesCanceledTransferIncome + gymClass.transferTotal
         // Totals
         options.totalIncome = +summary.totalIncome - gymClass.total
+        options.totalCashIncome = +summary.totalCashIncome - (gymClass.total - gymClass.transferTotal)
+        options.totalTransferIncome = +summary.totalTransferIncome - gymClass.transferTotal
         options.totalCanceled = +summary.totalCanceled + gymClass.total
         options.totalAmount = +summary.totalIncome - gymClass.total
       } else if (changeTo === false) {
@@ -181,9 +187,15 @@ export class GymClassService {
         options.gymClassesCanceledCount = +summary.gymClassesCanceledCount - 1
         // Incomes
         options.gymClassesIncome = +summary.gymClassesIncome + gymClass.total
+        options.gymClassesCashIncome = +summary.gymClassesCashIncome + (gymClass.total - gymClass.transferTotal)
+        options.gymClassesTransferIncome = +summary.gymClassesTransferIncome + gymClass.transferTotal
         options.gymClassesCanceledIncome = +summary.gymClassesCanceledIncome - gymClass.total
+        options.gymClassesCanceledCashIncome = +summary.gymClassesCanceledCashIncome - (gymClass.total - gymClass.transferTotal)
+        options.gymClassesCanceledTransferIncome = +summary.gymClassesCanceledTransferIncome - gymClass.transferTotal
         // Totals
         options.totalIncome = +summary.totalIncome + gymClass.total
+        options.totalCashIncome = +summary.totalIncome + (gymClass.total - gymClass.transferTotal)
+        options.totalTransferIncome = +summary.totalIncome + gymClass.transferTotal
         options.totalCanceled = +summary.totalCanceled - gymClass.total
         options.totalAmount = +summary.totalIncome + gymClass.total
       }
