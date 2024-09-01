@@ -118,7 +118,7 @@ export class GymClassService {
       throw new NotFoundException(`Gym class with ID ${id} not found`);
     }
 
-    await this.gymClassRepository.save({ ...gymClass, ...updateGymClassRequest });
+    await this.gymClassRepository.update(gymClass, updateGymClassRequest);
   }
 
   async removeOrRestore({ id, changeTo }: { id: string; changeTo: boolean }) {
