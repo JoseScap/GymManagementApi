@@ -12,6 +12,8 @@ import { ActiveMemberStatus, MemberStatus } from 'src/members/enums/member.enum'
 import { Summary } from 'src/summaries/entities/summary.entity';
 import { getDate, getMonth, getYear } from 'date-fns';
 import { QueryPartialEntity } from 'typeorm/query-builder/QueryPartialEntity';
+import { FindPaginatedOptions } from './types/service-options';
+
 @Injectable()
 export class SubscriptionsService {
 
@@ -65,12 +67,29 @@ export class SubscriptionsService {
     return result
   }
 
-  async findPaginated(page: number, embedMember: boolean): Promise<PaginatedApiResponse<Subscription>> {
+  async findPaginated({ page, dateFrom, dateTo, dni, fullname}: FindPaginatedOptions): Promise<PaginatedApiResponse<Subscription>> {
     let data: Subscription[]
-    if (page < 1) page = 1
+    if (!(page < 1)) page = 1
 
     // Contamos cuantos subscriptions hay
-    const items = await this.subscriptionRepository.count();
+
+    let countQuery = this.subscriptionRepository
+    .createQueryBuilder('ggcc')
+    .leftJoinAndSelect('ggcc.member', 'member')
+
+    if (dni) {
+      countQuery = countQuery.andWhere('LOWER(member.dni) LIKE LOWER(:dni)', { dni: `%${dni}%` });
+    }
+
+    if (fullname) {
+      countQuery = countQuery.andWhere('LOWER(member.fullname) LIKE LOWER(:fullname)', { fullname: `%${fullname}%` });
+    }
+    
+    if (dateFrom && dateTo) {
+      countQuery = countQuery.andWhere('ggcc.dateFrom >= :dateFrom AND ggcc.dateTo <= :dateTo', { dateFrom, dateTo });
+    }
+
+    const items = await countQuery.getCount();
 
     // Calculamos la primer pagina y si existe anterior
     const first = items > 0 ? 1 : 0
@@ -83,15 +102,27 @@ export class SubscriptionsService {
     // La cantidad de paginas coincide con la ultima
     const pages = last;
 
-    // buscamos la data
-    data = await this.subscriptionRepository.find({
-      skip: (page - 1) * PER_PAGE,
-      take: PER_PAGE,
-      order: {
-        createdAt: 'DESC'
-      },
-      relations: { member: embedMember }
-    });
+    let dataQuery = this.subscriptionRepository
+      .createQueryBuilder('ggcc')
+      .leftJoinAndSelect('ggcc.member', 'member')
+
+    if (dni) {
+      dataQuery = dataQuery.andWhere('LOWER(member.dni) LIKE LOWER(:dni)', { dni: `%${dni}%` });
+    }
+
+    if (fullname) {
+      dataQuery = dataQuery.andWhere('LOWER(member.fullname) LIKE LOWER(:fullname)', { fullname: `%${fullname}%` });
+    }
+
+    if (dateFrom && dateTo) {
+      dataQuery = dataQuery.andWhere('ggcc.dateFrom >= :dateFrom AND ggcc.dateTo <= :dateTo', { dateFrom, dateTo });
+    }
+
+    dataQuery = dataQuery.orderBy('ggcc.createdAt', 'DESC')
+      .skip((page - 1) * PER_PAGE)
+      .take(PER_PAGE);
+
+    data = await dataQuery.getMany();
 
     return {
       first,
@@ -232,4 +263,5 @@ export class SubscriptionsService {
       await queryRunner.release();
     }
   }
+
 }

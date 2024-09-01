@@ -8,8 +8,7 @@ import { RestoreSubscriptionResponse } from './dto/response/restore-subscription
 import { RemoveSubscriptionResponse } from './dto/response/remove-subscription.response';
 import { UpdateSubscriptionsResponse } from './dto/response/update-subscription.response';
 import { FindPaginatedSubscriptionsResponse } from './dto/response/find-paginated.response';
-import { MemberStatus } from 'src/members/enums/member.enum';
-
+import { FindPaginatedQuery } from './dto/request/find-paginated.query';
 @Controller('subscriptions')
 export class SubscriptionsController {
   constructor(private readonly subscriptionsService: SubscriptionsService) {}
@@ -22,13 +21,9 @@ export class SubscriptionsController {
 
   @Get('find-paginated')
   async findPaginated(
-    @Query('page') page: string,
-    @Query('embedMember', ParseBoolPipe) embedMember: boolean
+    @Query() queries: FindPaginatedQuery
   ): Promise<FindPaginatedSubscriptionsResponse> {
-    const parsedPage = Number(page);
-    const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
-
-    return this.subscriptionsService.findPaginated(sanitizedPage, embedMember)
+    return this.subscriptionsService.findPaginated(queries)
   }
 
   @Get('fina-one/:id')

@@ -6,6 +6,7 @@ import { RemoveGymClassResponse } from './dto/response/remove-gymClass.response'
 import { UpdateGymClassRequest } from './dto/request/update-gymClass.request';
 import { FindOneGymClass } from './dto/response/findOne-gymClass.response';
 import { FindPaginatedGymClassResponse } from './dto/response/find-paginated.response';
+import { FindPaginatedQuery } from './dto/request/find-paginated.query';
 
 @Controller('classes')
 export class GymClassController {
@@ -19,12 +20,9 @@ export class GymClassController {
 
   @Get('find-paginated')
   async findPaginated(
-    @Query('page') page: string
+    @Query() queries: FindPaginatedQuery,
   ): Promise<FindPaginatedGymClassResponse> {
-    const parsedPage = Number(page);
-    const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
-
-    return this.gymClassService.findPaginated(sanitizedPage);
+    return this.gymClassService.findPaginated(queries);
   }
 
   @Get('find-one/:id')
