@@ -407,6 +407,7 @@ export class SubscriptionsService {
         totalCashIncome: newSign.totalCashIncome,
         totalTransferIncome: newSign.totalTransferIncome,
         totalAmount: newSign.newMembersIncome + newSign.renewedMembersIncome + newSign.gymClassesIncome,
+        isModified: true
       })
     } catch (error) {
       // Si hay un error, revertimos la transacción
