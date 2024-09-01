@@ -268,6 +268,46 @@ export class SummariesService {
 
         return summaries[0]
     }
+
+    async getMonth(date: Date) {
+        const summaries = await this.summaryRepository.createQueryBuilder('ss')
+            .select('SUM(ss.newMembersCount)', 'newMembersCount')
+            .addSelect('SUM(ss.newMembersIncome)', 'newMembersIncome')
+            .addSelect('SUM(ss.newMembersCashIncome)', 'newMembersCashIncome')
+            .addSelect('SUM(ss.newMembersTransferIncome)', 'newMembersTransferIncome')
+            .addSelect('SUM(ss.newMembersCanceledCount)', 'newMembersCanceledCount')
+            .addSelect('SUM(ss.newMembersCanceledIncome)', 'newMembersCanceledIncome')
+            .addSelect('SUM(ss.newMembersCanceledCashIncome)', 'newMembersCanceledCashIncome')
+            .addSelect('SUM(ss.newMembersCanceledTransferIncome)', 'newMembersCanceledTransferIncome')
+            .addSelect('SUM(ss.renewedMembersCount)', 'renewedMembersCount')
+            .addSelect('SUM(ss.renewedMembersIncome)', 'renewedMembersIncome')
+            .addSelect('SUM(ss.renewedMembersCashIncome)', 'renewedMembersCashIncome')
+            .addSelect('SUM(ss.renewedMembersTransferIncome)', 'renewedMembersTransferIncome')
+            .addSelect('SUM(ss.renewedMembersCanceledCount)', 'renewedMembersCanceledCount')
+            .addSelect('SUM(ss.renewedMembersCanceledIncome)', 'renewedMembersCanceledIncome')
+            .addSelect('SUM(ss.renewedMembersCanceledCashIncome)', 'renewedMembersCanceledCashIncome')
+            .addSelect('SUM(ss.renewedMembersCanceledTransferIncome)', 'renewedMembersCanceledTransferIncome')
+            .addSelect('SUM(ss.gymClassesCount)', 'gymClassesCount')
+            .addSelect('SUM(ss.gymClassesIncome)', 'gymClassesIncome')
+            .addSelect('SUM(ss.gymClassesCashIncome)', 'gymClassesCashIncome')
+            .addSelect('SUM(ss.gymClassesTransferIncome)', 'gymClassesTransferIncome')
+            .addSelect('SUM(ss.gymClassesCanceledCount)', 'gymClassesCanceledCount')
+            .addSelect('SUM(ss.gymClassesCanceledIncome)', 'gymClassesCanceledIncome')
+            .addSelect('SUM(ss.gymClassesCanceledCashIncome)', 'gymClassesCanceledCashIncome')
+            .addSelect('SUM(ss.gymClassesCanceledTransferIncome)', 'gymClassesCanceledTransferIncome')
+            .addSelect('SUM(ss.totalIncome)', 'totalIncome')
+            .addSelect('SUM(ss.totalCashIncome)', 'totalCashIncome')
+            .addSelect('SUM(ss.totalTransferIncome)', 'totalTransferIncome')
+            .addSelect('SUM(ss.totalCanceled)', 'totalCanceled')
+            .addSelect('SUM(ss.totalAmount)', 'totalAmount')
+            .where('ss.year = :year AND ss.month = :month', { year: getYear(date), month: getMonth(date) + 1 })
+            .groupBy('CONCAT(ss.year, ss.month)')
+            .getRawMany<GroupedWeekSummary>()
+
+        if (summaries === null || summaries.length === 0) throw new NotFoundException()
+
+        return summaries[0]
+    }
     
     async signToday() {
         const data = await this.getToday();
@@ -304,6 +344,8 @@ export class SummariesService {
             renewedMembersTransferIncome: data.renewedMembersTransferIncome,
             renewedMembersCanceledCount: data.renewedMembersCanceledCount,
             renewedMembersCanceledIncome: data.renewedMembersCanceledIncome,
+            renewedMembersCanceledCashIncome: data.renewedMembersCanceledCashIncome,
+            renewedMembersCanceledTransferIncome: data.renewedMembersCanceledTransferIncome,
             gymClassesCount: data.gymClassesCount,
             gymClassesIncome: data.gymClassesIncome,
             gymClassesCashIncome: data.gymClassesCashIncome,
