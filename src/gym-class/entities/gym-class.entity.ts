@@ -15,6 +15,9 @@ export class GymClass {
     total: number;
 
     @Column()
+    transferTotal: number;
+
+    @Column()
     date: Date;
 
     @Column({ default: false })
