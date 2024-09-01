@@ -233,17 +233,31 @@ export class SummariesService {
         const summaries = await this.summaryRepository.createQueryBuilder('ss')
             .select('SUM(ss.newMembersCount)', 'newMembersCount')
             .addSelect('SUM(ss.newMembersIncome)', 'newMembersIncome')
+            .addSelect('SUM(ss.newMembersCashIncome)', 'newMembersCashIncome')
+            .addSelect('SUM(ss.newMembersTransferIncome)', 'newMembersTransferIncome')
             .addSelect('SUM(ss.newMembersCanceledCount)', 'newMembersCanceledCount')
             .addSelect('SUM(ss.newMembersCanceledIncome)', 'newMembersCanceledIncome')
+            .addSelect('SUM(ss.newMembersCanceledCashIncome)', 'newMembersCanceledCashIncome')
+            .addSelect('SUM(ss.newMembersCanceledTransferIncome)', 'newMembersCanceledTransferIncome')
             .addSelect('SUM(ss.renewedMembersCount)', 'renewedMembersCount')
             .addSelect('SUM(ss.renewedMembersIncome)', 'renewedMembersIncome')
+            .addSelect('SUM(ss.renewedMembersCashIncome)', 'renewedMembersCashIncome')
+            .addSelect('SUM(ss.renewedMembersTransferIncome)', 'renewedMembersTransferIncome')
             .addSelect('SUM(ss.renewedMembersCanceledCount)', 'renewedMembersCanceledCount')
             .addSelect('SUM(ss.renewedMembersCanceledIncome)', 'renewedMembersCanceledIncome')
+            .addSelect('SUM(ss.renewedMembersCanceledCashIncome)', 'renewedMembersCanceledCashIncome')
+            .addSelect('SUM(ss.renewedMembersCanceledTransferIncome)', 'renewedMembersCanceledTransferIncome')
             .addSelect('SUM(ss.gymClassesCount)', 'gymClassesCount')
             .addSelect('SUM(ss.gymClassesIncome)', 'gymClassesIncome')
+            .addSelect('SUM(ss.gymClassesCashIncome)', 'gymClassesCashIncome')
+            .addSelect('SUM(ss.gymClassesTransferIncome)', 'gymClassesTransferIncome')
             .addSelect('SUM(ss.gymClassesCanceledCount)', 'gymClassesCanceledCount')
             .addSelect('SUM(ss.gymClassesCanceledIncome)', 'gymClassesCanceledIncome')
+            .addSelect('SUM(ss.gymClassesCanceledCashIncome)', 'gymClassesCanceledCashIncome')
+            .addSelect('SUM(ss.gymClassesCanceledTransferIncome)', 'gymClassesCanceledTransferIncome')
             .addSelect('SUM(ss.totalIncome)', 'totalIncome')
+            .addSelect('SUM(ss.totalCashIncome)', 'totalCashIncome')
+            .addSelect('SUM(ss.totalTransferIncome)', 'totalTransferIncome')
             .addSelect('SUM(ss.totalCanceled)', 'totalCanceled')
             .addSelect('SUM(ss.totalAmount)', 'totalAmount')
             .where('ss.year = :year AND ss.week = :week', { year: getYear(date), week: getWeek(date, { weekStartsOn: WEEK_STARTS_ON }) })
@@ -278,18 +292,30 @@ export class SummariesService {
             year: getYear(currentDate),
             newMembersCount: data.newMembersCount,
             newMembersIncome: data.newMembersIncome,
+            newMembersCashIncome: data.newMembersCashIncome,
+            newMembersTransferIncome: data.newMembersTransferIncome,
             newMembersCanceledCount: data.newMembersCanceledCount,
             newMembersCanceledIncome: data.newMembersCanceledIncome,
+            newMembersCanceledCashIncome: data.newMembersCanceledCashIncome,
+            newMembersCanceledTransferIncome: data.newMembersCanceledTransferIncome,
             renewedMembersCount: data.renewedMembersCount,
             renewedMembersIncome: data.renewedMembersIncome,
+            renewedMembersCashIncome: data.renewedMembersCashIncome,
+            renewedMembersTransferIncome: data.renewedMembersTransferIncome,
             renewedMembersCanceledCount: data.renewedMembersCanceledCount,
             renewedMembersCanceledIncome: data.renewedMembersCanceledIncome,
             gymClassesCount: data.gymClassesCount,
             gymClassesIncome: data.gymClassesIncome,
+            gymClassesCashIncome: data.gymClassesCashIncome,
+            gymClassesTransferIncome: data.gymClassesTransferIncome,
             gymClassesCanceledCount: data.gymClassesCanceledCount,
             gymClassesCanceledIncome: data.gymClassesCanceledIncome,
+            gymClassesCanceledCashIncome: data.gymClassesCanceledCashIncome,
+            gymClassesCanceledTransferIncome: data.gymClassesCanceledTransferIncome,
             totalCanceled: data.newMembersCanceledIncome + data.renewedMembersCanceledIncome + data.gymClassesCanceledIncome,
-            totalIncome: data.newMembersIncome + data.renewedMembersIncome + data.gymClassesIncome,
+            totalIncome: data.totalIncome,
+            totalCashIncome: data.totalCashIncome,
+            totalTransferIncome: data.totalTransferIncome,
             totalAmount: data.newMembersIncome + data.renewedMembersIncome + data.gymClassesIncome,
         });
     
