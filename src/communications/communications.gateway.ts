@@ -53,6 +53,7 @@ export class CommunicationsGateway implements OnGatewayConnection, OnGatewayDisc
 
   @SubscribeMessage('Bio:Identify')
   async BioIdentify(@MessageBody() message) {
+    if (message.id < 0) return this.server.emit('App:Identify', null)
     let member = await this.membersService.findOneByFingerprintId(message.Id)
     console.log("Bio:Identify -> Emit -> App:Identify -> with ", message, "-> Result ->", member)
     this.server.emit('App:Identify', member)
