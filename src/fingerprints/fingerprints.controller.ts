@@ -14,8 +14,8 @@ export class FingerprintsController {
 
   @Post()
   async createOne(@Body() createFingerprintDto: CreateOneFingerprintRequest): Promise<CreateOneFingerprintResponse> {
-    await this.service.create(createFingerprintDto);
-    return { data: null }
+    const data = await this.service.create(createFingerprintDto);
+    return { data }
   }
 
   @Get()

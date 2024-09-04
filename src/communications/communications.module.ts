@@ -5,6 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Member } from 'src/members/entities/member.entity';
 import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 import { Fingerprint } from 'src/fingerprints/entities/fingerprint.entity';
+import { GymLoggerService } from 'src/gym-logger/gym-logger.service';
 
 @Module({
   imports: [
@@ -12,6 +13,6 @@ import { Fingerprint } from 'src/fingerprints/entities/fingerprint.entity';
     TypeOrmModule.forFeature([Subscription]),
     TypeOrmModule.forFeature([Fingerprint])
   ],
-  providers: [CommunicationsGateway, MembersService]
+  providers: [CommunicationsGateway, MembersService, GymLoggerService]
 })
 export class CommunicationsModule { }
