@@ -15,6 +15,7 @@ import { SubscriptionSummary } from './summaries/entities/subscription_summary.v
 import { GymClassModule } from './gym-class/gym-class.module';
 import { GymClass } from './gym-class/entities/gym-class.entity';
 import { Summary } from './summaries/entities/summary.entity';
+import { GymLoggerModule } from './gym-logger/gym-logger.module';
 
 @Module({
   imports: [
@@ -41,7 +42,8 @@ import { Summary } from './summaries/entities/summary.entity';
     CommunicationsModule,
     FingerprintsModule,
     SummariesModule,
-    GymClassModule
+    GymClassModule,
+    GymLoggerModule
   ],
   controllers: [],
   providers: [],
