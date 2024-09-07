@@ -3,7 +3,7 @@ import { CreateOneFingerprintRequest } from './dto/request/create-one.request';
 import { UpdateOneFingerprintRequest } from './dto/request/update-one.request';
 import { Fingerprint } from './entities/fingerprint.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Between, Repository } from 'typeorm';
 import { PaginatedApiResponse } from 'src/types/ApiResponse';
 
 @Injectable()
@@ -36,8 +36,19 @@ export class FingerprintsService {
     // La cantidad de paginas coincide con la ultima
     const pages = last;
 
+    const today = new Date();
+    const sixtyFiveDaysAgo = new Date();
+    sixtyFiveDaysAgo.setDate(today.getDate() - 62);
+
     // buscamos la data
     const data = await this.repository.find({
+      where: {
+        lastSubscription: Between(sixtyFiveDaysAgo, today)
+
+      },
+      order: {
+        id: 'ASC'
+      },
       skip: (page - 1) * perPage,
       take: perPage
     });

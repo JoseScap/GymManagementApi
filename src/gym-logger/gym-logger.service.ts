@@ -12,7 +12,6 @@ export class GymLoggerService {
             second: '2-digit',
             hour12: true,
         });
-        console.log(`[Cronos] - ${timestamp}:`);
-        console.log(messages);
+        console.log('[Cronos]:', timestamp, ...messages);
     }
 }

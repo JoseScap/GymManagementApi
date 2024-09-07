@@ -15,4 +15,7 @@ export class Fingerprint {
 
     @Column()
     memberId: string;
+
+    @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+    lastSubscription: Date;
 }

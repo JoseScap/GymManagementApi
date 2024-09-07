@@ -36,6 +36,7 @@ async function bootstrap() {
   const configService = app.get(ConfigService);
   const corsOrigin = configService.get<string>('CORS_ORIGIN');
   const corsMethods = configService.get<string>('CORS_METHODS');
+  const apiPort = configService.get<number>('API_PORT');
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }))
   app.enableCors({
@@ -44,6 +45,6 @@ async function bootstrap() {
   });
   app.useWebSocketAdapter(new SocketAdapter(app))
   
-  await app.listen(3000);
+  await app.listen(apiPort);
 }
 bootstrap();
