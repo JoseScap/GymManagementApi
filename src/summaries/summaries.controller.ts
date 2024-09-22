@@ -35,6 +35,12 @@ export class SummariesController {
         return this.summariesService.getMonth(new Date(day))
     }
 
+    @Get('verify')
+    verifyLastDay()
+    {
+        return this.summariesService.verifyLastDay()
+    }
+
     @Post()
     signToday()
     {

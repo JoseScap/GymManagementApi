@@ -4,11 +4,12 @@ import { SubscriptionSummary } from './entities/subscription_summary.view';
 import { Repository } from 'typeorm';
 import { GroupedSubSummary } from './entities/grouped_sub_summary.view';
 import { Summary } from './entities/summary.entity';
-import { getDate, getMonth, getWeek, getYear } from 'date-fns';
+import { getDate, getMonth, getWeek, getYear, isToday } from 'date-fns';
 import { GymClass } from 'src/gym-class/entities/gym-class.entity';
 import { GroupedGgccSummary } from './entities/grouped_ggcc_summary.view';
 import { GroupedWeekSummary } from './entities/grouped_week_summary.view';
 import { WEEK_STARTS_ON } from 'src/common/constants';
+import { Subscription } from 'src/subscriptions/entities/subscription.entity';
 
 @Injectable()
 export class SummariesService {
@@ -18,7 +19,9 @@ export class SummariesService {
         @InjectRepository(GymClass)
         private ggccRepository: Repository<GymClass>,
         @InjectRepository(Summary)
-        private summaryRepository: Repository<Summary>
+        private summaryRepository: Repository<Summary>,
+        @InjectRepository(Subscription)
+        private subRepository: Repository<Subscription>
     ) { }
 
     async getToday() {
@@ -308,6 +311,45 @@ export class SummariesService {
 
         return summaries[0]
     }
+
+    async verifyLastDay() {
+        const lastSubs = await this.subRepository.find({
+          order: { createdAt: 'DESC' },
+          take: 1
+        });
+        console.log(lastSubs)
+      
+        if (lastSubs.length === 0) {
+          // Si no hay suscripciones, devuelve algún valor por defecto o lanza una excepción
+          return { kind: 'NoSubscriptions', date: null };
+        }
+        const lastSub = lastSubs[0]
+      
+        // Si la última suscripción es de hoy
+        if (isToday(lastSub.createdAt)) {
+          return { kind: 'Today', date: null };
+        }
+      
+        // Si no es de hoy, busca el cierre correspondiente al día de la última suscripción
+        const summary = await this.summaryRepository.findOne({
+          where: {
+            day: getDate(lastSub.createdAt),
+            month: getMonth(lastSub.createdAt) + 1, // +1 porque getMonth devuelve 0-11
+            year: getYear(lastSub.createdAt),
+          },
+        });
+      
+        if (summary) {
+          // Si el cierre existe para ese día
+          return { kind: 'Closed', date: null };
+        } else {
+          // Si el cierre no existe, falta el cierre de ese día
+          return {
+            kind: 'PendingClosure',
+            date: lastSub.createdAt.toISOString(), // Devuelve la fecha de la última suscripción en ISO string
+          };
+        }
+      }
     
     async signToday() {
         const data = await this.getToday();
