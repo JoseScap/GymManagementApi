@@ -11,6 +11,12 @@ export class SummariesController {
         return this.summariesService.getToday()
     }
 
+    @Get('lastDay')
+    getLastDay()
+    {
+        return this.summariesService.getLastDay()
+    }
+
     @Get('day')
     getDay(@Query('day') day: string)
     {
@@ -45,5 +51,11 @@ export class SummariesController {
     signToday()
     {
         return this.summariesService.signToday();    
+    }
+
+    @Post('lastDay')
+    signLastDay()
+    {
+        return this.summariesService.signLastDay();    
     }
 }
