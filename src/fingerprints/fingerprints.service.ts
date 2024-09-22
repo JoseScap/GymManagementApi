@@ -38,7 +38,7 @@ export class FingerprintsService {
 
     const today = new Date();
     const sixtyFiveDaysAgo = new Date();
-    sixtyFiveDaysAgo.setDate(today.getDate() - 62);
+    sixtyFiveDaysAgo.setDate(today.getDate() - 60);
 
     // buscamos la data
     const data = await this.repository.find({
