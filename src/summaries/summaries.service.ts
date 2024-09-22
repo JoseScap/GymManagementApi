@@ -530,9 +530,6 @@ export class SummariesService {
         }
         const lastSub = lastSubs[0]
       
-        // // Si la última suscripción es de hoy
-        
-      
         // Si no es de hoy, busca el cierre correspondiente al día de la última suscripción
         const summary = await this.summaryRepository.findOne({
           where: {
@@ -541,12 +538,12 @@ export class SummariesService {
             year: getYear(lastSub.createdAt),
           },
         });
-      
-        if (summary) {
+
+        if (summary && isToday(lastSub.createdAt)) {
           // Si el cierre existe para ese día
           return { kind: 'Closed', date: null };
-        } else if (isToday(lastSub.createdAt)) {
-          return { kind: 'Today', date: null };
+        } else if (summary && !isToday(lastSub.createdAt)) {
+          return { kind: 'Opened', date: null };
         } else {
           // Si el cierre no existe, falta el cierre de ese día
           return {
