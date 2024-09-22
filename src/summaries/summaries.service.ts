@@ -539,13 +539,14 @@ export class SummariesService {
           },
         });
 
-        if (summary && isToday(lastSub.createdAt)) {
+        if (isToday(lastSub.createdAt) && summary) {
           // Si el cierre existe para ese día
-          return { kind: 'Closed', date: null };
-        } else if (summary && !isToday(lastSub.createdAt)) {
-          return { kind: 'Opened', date: null };
+          return { kind: 'ClosedToday', date: null };
+        } else if (isToday(lastSub.createdAt) && !summary) {
+          return { kind: 'OpenedToday', date: null };
+        } else if (!isToday(lastSub.createdAt) && summary) {
+          return { kind: 'ClosedAnotherDay', date: null };
         } else {
-          // Si el cierre no existe, falta el cierre de ese día
           return {
             kind: 'PendingClosure',
             date: lastSub.createdAt.toISOString(), // Devuelve la fecha de la última suscripción en ISO string
