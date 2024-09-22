@@ -134,6 +134,19 @@ export class MembersService {
     }
   }
 
+  async findActive(dni: string, fullname: string): Promise<Member[]> {
+    const activeMembers = await this.memberRepository
+      .createQueryBuilder('mm')
+      .leftJoinAndSelect('mm.subscriptions', 'ss')
+      .where('mm.dni like :dni', { dni: `%${dni}%` })
+      .andWhere('mm.fullName LIKE :fullname', { fullname: `%${fullname}%` })
+      .andWhere('ss.isCanceled = false')
+      .limit(PER_PAGE)
+      .getMany();
+  
+    return activeMembers;
+  }
+
   async findOne(id: string, embedSubscriptions: boolean): Promise<Member> {
     let member: Member;
 

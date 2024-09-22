@@ -11,6 +11,7 @@ import { RestoreMemberResponse } from './dto/response/restore-member.response';
 import { FindPaginatedMemberQuery } from './dto/query/find-paginated.query';
 import { CreateSubscriptedMemberRequest } from './dto/request/create-subscripted-member.request';
 import { CreateSubscriptedMemberResponse } from './dto/response/create-subscripted-one.response';
+import { Member } from './entities/member.entity';
 
 @Controller('members')
 export class MembersController {
@@ -39,6 +40,14 @@ export class MembersController {
     const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
 
     return this.membersService.findPaginated(sanitizedPage, embedSubscriptions === 'true', currentStatus);
+  }
+
+  @Get('find-active')
+  async findActive(
+    @Query('dni') dni?: string,
+    @Query('fullname') fullname?: string
+  ): Promise<Member[]> {
+    return this.membersService.findActive(dni || '', fullname || '');
   }
 
   @Get('find-one/:id')
