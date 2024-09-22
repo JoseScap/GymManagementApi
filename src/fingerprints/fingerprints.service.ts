@@ -42,9 +42,18 @@ export class FingerprintsService {
 
     // buscamos la data
     const data = await this.repository.find({
+      relations: {
+        member: {
+          subscriptions: true
+        }
+      },
       where: {
-        lastSubscription: Between(sixtyFiveDaysAgo, today)
-
+        lastSubscription: Between(sixtyFiveDaysAgo, today),
+        member: {
+          subscriptions: {
+            isCanceled: false
+          }
+        }
       },
       order: {
         id: 'ASC'
