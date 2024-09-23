@@ -7,6 +7,7 @@ import { FindPaginatedFingerprintResponse } from './dto/response/find-paginated.
 import { FindOneFingerprintResponse } from './dto/response/find-one.response';
 import { RemoveOneFingerprintResponse } from './dto/response/remove-one.response';
 import { UpdateOneFingerprintResponse } from './dto/response/update-one.response';
+import { instanceToPlain } from 'class-transformer';
 
 @Controller('fingerprints')
 export class FingerprintsController {
@@ -19,11 +20,13 @@ export class FingerprintsController {
   }
 
   @Get()
-  findPaginated(@Query('page') page: string): Promise<FindPaginatedFingerprintResponse> {
+  async findPaginated(@Query('page') page: string) {
     const parsedPage = Number(page)
     const sanitizedPage = isNaN(parsedPage) ? 1 : parsedPage
     
-    return this.service.findPaginated(sanitizedPage);
+    const fingerPrints = await this.service.findPaginated(sanitizedPage);
+    const response = instanceToPlain(fingerPrints);
+    return response
   }
 
   @Get(':id')
